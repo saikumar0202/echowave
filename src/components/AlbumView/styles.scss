@@ -1,0 +1,67 @@
+@import "../../styles/light/variables";
+@import "../../styles/light/fonts";
+.album-view{
+  width: 120px;
+  position: relative;
+  &:hover {
+    .album-view__play {
+      display: flex;
+      &:hover {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+  }
+  &__play {
+    transition: all 0.3s;
+    cursor: pointer;
+    height: 40px;
+    width: 40px;
+    border-radius: 50%;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    top: 70px;
+    right: 10px;
+    background-color: $primary-color;
+    opacity: 0.9;
+    transform: scale(0.9);
+    box-shadow: 0 0 4px 0 #0000004D;
+    i {
+      color: $white;
+    }
+
+  }
+  a {
+    text-decoration: none;
+  }
+  &__image{
+    max-width: 120px;
+    border-radius: 6px;
+    box-shadow: 0 4px 8px 1px #00000034;
+  }
+
+  &__name{
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: $font-md;
+    color: $primary-text;
+    text-align: left;
+  }
+  &__making{
+    display: flex;
+    width: 100%;
+    font-size: $font-sm;
+    color: $grey1;
+    &--artist {
+      //flex: 1;
+      display: block;
+      overflow: hidden;
+      //width: calc(100% - 20px);
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+  }
+}

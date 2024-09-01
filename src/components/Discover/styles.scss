@@ -1,0 +1,15 @@
+@import "../../styles/light/fonts";
+@import "../../styles/light/variables";
+.discover-section {
+  flex: min(30%, 300px);
+  border-left: 1px solid $grey2;
+  border-right: 1px solid $grey2;
+  overflow: hidden;
+  overflow-y: auto;
+  &__header {
+    font-size: $font-xl;
+    text-align: left;
+    margin-bottom: 40px;
+    padding: 0 20px;
+  }
+}
