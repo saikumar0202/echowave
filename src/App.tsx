@@ -1,6 +1,6 @@
 import React from 'react';
-import logo from './logo.svg';
 import './App.scss';
+import './global.scss';
 import store from './redux/store';
 import { Sidebar } from "./components/Sidebar";
 import { Discover } from "./components/Discover";
