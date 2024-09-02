@@ -1,0 +1,60 @@
+@mixin flex-column {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.sidebar {
+    background-color: rgba(250, 250, 250, 1);
+    @include flex-column;
+    justify-content: space-between;
+    button{
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: #1ed760;
+        :hover{
+            background: #1ed760;
+            color: white;
+        }
+    }
+    &__top {
+        &__profile {
+            @include flex-column;
+            margin: 21px 11px 23px 11px;
+            gap: 14px;
+        }
+
+        &__songActions, &__action {
+            @include flex-column;
+        }
+
+        &__border{
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        &__songActions{
+            @include flex-column;
+            margin-top: 14px;
+            column-gap: 6px;
+            >*{
+                width: 42px;
+                height: 42px;
+                margin: 0 6px;
+            }
+        }
+    }
+
+    &__bottom{
+        margin: 0 6px 6px 6px;
+        &__actions{
+            @include flex-column;
+        }
+        button{
+            height: 42px;
+            width: 42px;
+            color: rgba(0, 0, 0, 0.45);
+        }
+    }
+    
+}
