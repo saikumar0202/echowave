@@ -1,0 +1,223 @@
+@import "../../styles/light/fonts";
+@import "../../styles/light/variables";
+
+.now-playing {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  margin: auto;
+  padding: 20px;
+  border-radius: 16px;
+  height: 100%;
+  background-color: $grey4;
+
+  &__title {
+    font-size: $font-xxl;
+    margin: $font-lg;
+  }
+
+  &__album {
+    &-art {
+      flex: 1;
+      padding: 20px 40px;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      img {
+        display: block;
+
+        width: min(80%, 400px);
+        border-radius: 6px;
+        margin-bottom: 10px;
+      }
+    }
+    &-image {
+      width: 100%;
+      flex: 1;
+      height: calc(100% - 98px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  }
+
+  &__info {
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    width: 100%;
+    max-width: 70%;
+    &-wrapper {
+      flex: 1;
+    }
+    i{
+      font-size: $font-lg;
+      color: $primary-color-fade;
+    }
+    &-like {
+      all: initial;
+      cursor: pointer;
+      &.liked i {
+        color: $primary-color;
+      }
+    }
+  }
+
+  &__song-title {
+    font-size: $font-lg;
+    font-weight: bold;
+    margin-bottom: 4px;
+    color: #000000; // Black text
+  }
+
+  &__artist-name {
+    font-size: $font-lg;
+    color: #777;
+      margin: 0;
+  }
+
+  &__controls {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+  }
+
+  &__time {
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    margin-bottom: $font-xl;
+
+    input[type="range"] {
+      flex-grow: 1;
+      -webkit-appearance: none;
+      appearance: none;
+      height: 5px;
+      background: $grey2; // Blue track
+      border-radius: 5px;
+      outline: none;
+      margin: 0;
+
+      &::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background: $primary-color; // Green thumb
+        cursor: pointer;
+      }
+    }
+    #currentTime, #trackTime {
+      position: absolute;
+      top: -30px;
+      font-size: $font-md;
+    }
+    #currentTime {
+      left: 0;
+    }
+
+    #trackTime {
+      right: 0;
+    }
+  }
+
+  &__actions {
+    display: flex;
+    justify-content: center;
+    gap: 32px;
+    width: 100%;
+    margin-bottom: 10px;
+  }
+
+  .control-button {
+    font-size: $font-xl;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: $primary-color;
+    &--play {
+      background-color: $primary-color;
+      border-radius: 50%;
+      width: 64px;
+      height: 64px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      i {
+        color: $white;
+      }
+    }
+    &--shuffle, &--repeat {
+      color: $grey1;
+    }
+  }
+
+  &__volume {
+    position: relative;
+    width: max(50%, 200px);
+    input[type="range"] {
+      width: 100%;
+      -webkit-appearance: none;
+      appearance: none;
+      height: 3px;
+      background: $grey2; // Green track
+      border-radius: 5px;
+      outline: none;
+      margin: 0;
+
+      &::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 15px;
+        height: 15px;
+        border-radius: 50%;
+        background: $primary-color; // Dark gray thumb
+        cursor: pointer;
+      }
+    }
+  }
+
+  &__device {
+    margin-top: 20px;
+    background-color: #e3f2fd; // Light blue background
+    border-radius: 16px;
+    padding: 8px 16px;
+    font-size: 14px;
+    color: #2c3e50; // Dark gray text
+  }
+}
+
+.buffering-indicator {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 5px;
+  border-radius: 10px;
+  background: $primary-color-fade;
+  width: 0;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0.4;
+}
+
+.seek-indicator, .volume-indicator {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 5px;
+  background: $primary-color;
+  border-radius: 10px;
+  pointer-events: none;
+  z-index: 1;
+  width: 0;
+}
+.volume-indicator {
+  height: 3px;
+  top: 15px;
+}
