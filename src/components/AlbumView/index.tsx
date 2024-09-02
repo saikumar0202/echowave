@@ -12,7 +12,6 @@ export const SongLargeView = (props: SongLargeViewProps) => {
     <li className='album-view'>
         <img className='album-view__image' src={imageUrl.url} alt={name} />
         <div className='album-view__details'>
-          {/*@ts-ignore*/}
           <div className='album-view__name'>{name}</div>
           <div className='album-view__making'>
             <span className='album-view__making--artist'>{artists?.primary?.[0]?.name}</span>,
