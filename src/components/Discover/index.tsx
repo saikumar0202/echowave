@@ -3,7 +3,7 @@ import './styles.scss';
 import { TopChart } from "./TopChart";
 import { Suggestions } from "./Suggestions";
 
-const albums = [
+export const albums = [
   {
     "id": "14799536",
     "name": "Believer",
@@ -470,7 +470,7 @@ const albums = [
   }
 ]
 
-const songs = [
+export const songs = [
   {
     "id": "q3rXyZA6",
     "name": "Mass",

@@ -9,10 +9,13 @@
 .main-container {
   display: flex;
   flex: 1;
+  width: calc(100% - 54px) // sidebar
 }
 .player-section {
   flex: 40%;
 }
 .track-section {
   flex: 30%;
+  width: 296px;
+  overflow-y: auto;
 }
