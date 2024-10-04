@@ -12,7 +12,7 @@ export const Sidebar = () => {
                     <button><i className="fa-solid fa-compass"></i></button>
                     <button><i className="fa-solid fa-headphones"></i></button>
                     <button><i className="fa-regular fa-heart"></i></button>
-                    <button><i className="fa-solid fa-book-bookmark" style={{ color: "#28a42a" }}></i></button>
+                    <button><i className="fa-solid fa-book-bookmark"></i></button>
                 </div>
             </div>
             <div className="sidebar__bottom">

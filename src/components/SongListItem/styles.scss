@@ -97,8 +97,12 @@
   }
   &__index {
     font-weight: 500;
+    width: 16px;
+    max-width: 16px;
   }
   &__drag {
     color: $grey2;
+    width: 16px;
+    max-width: 16px;
   }
 }

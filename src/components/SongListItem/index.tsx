@@ -1,6 +1,8 @@
 import * as React from 'react';
 import { Song } from "../../Services/interfaces";
 import './styles.scss';
+import { useAppDispatch } from "../../redux/store";
+import { setNowPlayingSong } from "../../redux/reducers/SongReducer";
 
 interface BaseProps {
   song: Song
@@ -20,10 +22,16 @@ type SongListItemProps = BaseProps | IndexProps | DragProps;
 
 export const SongListItem = (props: SongListItemProps) => {
   const {song, type} = props;
+  const dispatch = useAppDispatch();
   const {name, image, artists, duration, year} = song;
   const imageUrl = image[0] || image[1] || image[2];
   const artistList = artists?.primary || artists?.all || 'Artist';
-  const durationFormatted = `${Math.floor(duration / 60)}:${duration % 60}`;
+  const durationFormatted = `${Math.floor(duration / 60)}:${(duration % 60).toString().padStart(2,'0')}`;
+
+  const handlePlaySong = () => {
+    dispatch(setNowPlayingSong(song));
+  }
+
   const Artists = artistList?.map((artist, index) => {
     return (
       <>
@@ -44,11 +52,11 @@ export const SongListItem = (props: SongListItemProps) => {
       )}
       <div className='song-list-item__image'>
         <img src={imageUrl.url} alt={name}/>
-        <div className='song-list-item__play'>
+        <div className='song-list-item__play' onClick={handlePlaySong}>
           <i className="fa-solid fa-play"></i>
         </div>
       </div>
-      <div className={`song-list-item__details ${type === "DRAG" ? 'song-list-item__details-drag' : ''}`}>
+      <div className={`song-list-item__details ${type === "DRAG" || type === "INDEX" ? 'song-list-item__details-drag' : ''}`}>
         <div className='song-list-item__name-and-duration'>
           <div className='song-list-item__name' title={name} dangerouslySetInnerHTML={{__html: name}}></div>
           <div className='song-list-item__duration'>{durationFormatted}</div>
