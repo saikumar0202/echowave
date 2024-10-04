@@ -1,3 +1,5 @@
+@import "../../styles/light/fonts";
+@import "../../styles/light/variables";
 @mixin flex-column {
     display: flex;
     flex-direction: column;
@@ -10,11 +12,18 @@
     justify-content: space-between;
     button{
         background: none;
+        width: 32px;
+        height: 32px;
         border: none;
         cursor: pointer;
-        color: #1ed760;
-        :hover{
-            background: #1ed760;
+        color: $primary-color;
+        border-radius: 14px;
+        transition: all 0.2s;
+        i{
+            font-size: $font-md;
+        }
+        &:hover{
+            background: $primary-color;
             color: white;
         }
     }
@@ -36,7 +45,7 @@
         &__songActions{
             @include flex-column;
             margin-top: 14px;
-            column-gap: 6px;
+            gap: 6px;
             >*{
                 width: 42px;
                 height: 42px;

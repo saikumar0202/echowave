@@ -11,7 +11,7 @@ export const Suggestions = (props: SuggestionsProps) => {
   return (
     <div className='suggestions'>
       <h2 className='suggestions__header'> You may like</h2>
-      <SongList songs={props.songs} type="PLAIN"/>
+    <SongList songs={props.songs} type="PLAIN"/>
     </div>
   );
 };

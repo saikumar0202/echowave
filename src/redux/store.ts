@@ -1,10 +1,14 @@
 import { configureStore } from "@reduxjs/toolkit";
-// import LoginReducer from "../Pages/Login/LoginReducer";
-// import loadingSlice from "./Reducers/Loading/LoadingReducer";
-export default configureStore({
-  reducer: {
-    // login: LoginReducer,
-    // loader: loadingSlice,
-  },
+import { rootReducer, RootState } from "./reducers/rootReducer";
+import { useDispatch, useSelector } from "react-redux";
+
+const store =  configureStore({
+  reducer: rootReducer,
   devTools: true,
+  middleware: (getDefaultMiddleware) => getDefaultMiddleware()
 });
+
+export type AppDispatch = typeof store.dispatch
+export const useAppSelector = useSelector.withTypes<RootState>();
+export const useAppDispatch = useDispatch.withTypes<AppDispatch>()
+export default store;
