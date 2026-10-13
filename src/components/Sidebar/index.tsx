@@ -6,7 +6,7 @@ import { routes } from "../../routes";
 import './styles.scss';
 
 // `also` lists other paths that belong to the same tab.
-export const NAV_ITEMS: { to: string, label: string, icon: string, end?: boolean, also?: string[] }[] = [
+const NAV_ITEMS: { to: string, label: string, icon: string, end?: boolean, also?: string[] }[] = [
   { to: routes.discover(), label: 'Discover', icon: 'fa-solid fa-compass', end: true },
   { to: routes.search(), label: 'Search', icon: 'fa-solid fa-magnifying-glass' },
   { to: routes.library(), label: 'Library', icon: 'fa-solid fa-book-bookmark', also: ['/liked', '/playlist/'] },

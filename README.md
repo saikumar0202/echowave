@@ -1,6 +1,6 @@
 # EchoWave
 
-A responsive music streaming web app built with React, TypeScript, Redux Toolkit and SCSS. Music data comes from the open-source [JioSaavn API](https://github.com/sumitkolhe/jiosaavn-api).
+A responsive music streaming web app built with React, TypeScript, Redux Toolkit, React Router and SCSS, bundled with Vite. Music data comes from the open-source [JioSaavn API](https://github.com/sumitkolhe/jiosaavn-api).
 
 ## Features
 
@@ -34,10 +34,10 @@ npm start
 
 Open http://localhost:3000.
 
-To use a different API host, set `REACT_APP_API_HOST`:
+To use a different API host, set `VITE_API_HOST`:
 
 ```bash
-REACT_APP_API_HOST=https://your-api.example.com/api/ npm start
+VITE_API_HOST=https://your-api.example.com/api/ npm start
 ```
 
 ## Scripts
@@ -45,8 +45,11 @@ REACT_APP_API_HOST=https://your-api.example.com/api/ npm start
 | Command | What it does |
 | --- | --- |
 | `npm start` | Dev server on port 3000 |
-| `npm test` | Unit tests (queue logic, formatting) |
-| `npm run build` | Production build in `build/` |
+| `npm test` | Unit tests (Vitest) |
+| `npm run lint` | ESLint |
+| `npm run typecheck` | TypeScript type check |
+| `npm run build` | Type check + production build in `build/` |
+| `npm run preview` | Serve the production build locally |
 
 ## Project structure
 
@@ -68,5 +71,5 @@ src/
 - name: Build the React app
   run: npm run build
   env:
-    REACT_APP_API_HOST: https://your-api.example.com/api/
+    VITE_API_HOST: https://your-api.example.com/api/
 ```

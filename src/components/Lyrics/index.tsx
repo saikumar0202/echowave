@@ -1,21 +1,13 @@
 import React, { useEffect, useRef } from 'react';
 import { Song } from "../../Services/interfaces";
-import { LyricLine } from "../../Services/lyrics";
+import { activeLineIndex, LyricLine } from "../../Services/lyrics";
 import { useAppDispatch, useAppSelector } from "../../redux/store";
 import { loadLyrics } from "../../redux/reducers/LyricsReducer";
-import { usePlayback } from "../../player/PlayerProvider";
+import { usePlayback } from "../../player/playback";
 import './styles.scss';
 
-// Lines light up slightly early so they feel in time with the singing.
-const LEAD_SECONDS = 0.3;
 // After the user scrolls, stop following the song for a moment.
 const MANUAL_SCROLL_PAUSE_MS = 3000;
-
-export const activeLineIndex = (lines: LyricLine[], time: number): number => {
-  let active = -1;
-  for (let i = 0; i < lines.length && lines[i].time <= time + LEAD_SECONDS; i++) active = i;
-  return active;
-};
 
 const SyncedLyrics = ({ lines }: { lines: LyricLine[] }) => {
   const { currentTime, seek } = usePlayback();

@@ -1,4 +1,4 @@
-import React, { createContext, useCallback, useContext, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { createPortal } from "react-dom";
 import { useNavigate } from "react-router-dom";
 import { Song } from "../../Services/interfaces";
@@ -8,23 +8,13 @@ import { addToPlaylist, createPlaylist } from "../../redux/reducers/LibraryReduc
 import { showToast } from "../../redux/reducers/UIReducer";
 import { routes } from "../../routes";
 import { artistNames, decodeEntities, pickImage } from "../../utils/format";
+import { MenuExtra, OpenMenu, SongMenuContext, useSongMenu } from "./context";
 import './styles.scss';
-
-interface MenuExtra {
-  // Context-specific action, e.g. "Remove from playlist".
-  remove?: { label: string, onSelect: () => void },
-}
 
 interface MenuState extends MenuExtra {
   song: Song,
   anchor: HTMLElement,
 }
-
-type OpenMenu = (song: Song, anchor: HTMLElement, extra?: MenuExtra) => void;
-
-const SongMenuContext = createContext<OpenMenu>(() => undefined);
-
-export const useSongMenu = () => useContext(SongMenuContext);
 
 export const SongMenuButton = ({ song, extra, className = '' }: { song: Song, extra?: MenuExtra, className?: string }) => {
   const open = useSongMenu();

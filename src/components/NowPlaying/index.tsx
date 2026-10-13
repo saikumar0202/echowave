@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from "../../redux/store";
 import { cycleRepeat, selectCurrentSong, toggleShuffle } from "../../redux/reducers/PlayerReducer";
 import { setNowPlayingOpen, setQueueOpen, toggleLyrics } from "../../redux/reducers/UIReducer";
-import { usePlayback } from "../../player/PlayerProvider";
+import { usePlayback } from "../../player/playback";
 import { artistNames, decodeEntities, formatTime, pickImage } from "../../utils/format";
 import { LikeButton } from "../LikeButton";
 import { ArtistLinks } from "../ArtistCard";

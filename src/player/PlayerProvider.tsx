@@ -1,35 +1,15 @@
-import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useStore } from "react-redux";
 import { AppStore, useAppDispatch, useAppSelector } from "../redux/store";
 import { playNext, previous, selectCurrentSong, setPlaying, togglePlaying } from "../redux/reducers/PlayerReducer";
 import { loadSuggestions } from "../redux/reducers/CatalogReducer";
 import { showToast } from "../redux/reducers/UIReducer";
 import { artistNames, decodeEntities, pickAudio } from "../utils/format";
+import { PlaybackContext, PlaybackContextValue } from "./playback";
 
 const VOLUME_STORAGE_KEY = 'echowave:volume';
 // Pressing "previous" this far into a song restarts it instead.
 const RESTART_THRESHOLD_SECONDS = 3;
-
-interface PlaybackContextValue {
-  currentTime: number,
-  duration: number,
-  volume: number,
-  muted: boolean,
-  toggle: () => void,
-  seek: (time: number) => void,
-  setVolume: (volume: number) => void,
-  toggleMute: () => void,
-  next: () => void,
-  prev: () => void,
-}
-
-const PlaybackContext = createContext<PlaybackContextValue | null>(null);
-
-export const usePlayback = (): PlaybackContextValue => {
-  const value = useContext(PlaybackContext);
-  if (!value) throw new Error('usePlayback must be used inside <PlayerProvider>');
-  return value;
-};
 
 const readStoredVolume = (): number => {
   try {

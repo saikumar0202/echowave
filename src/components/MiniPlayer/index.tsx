@@ -2,7 +2,7 @@ import * as React from 'react';
 import { useAppDispatch, useAppSelector } from "../../redux/store";
 import { selectCurrentSong } from "../../redux/reducers/PlayerReducer";
 import { setNowPlayingOpen } from "../../redux/reducers/UIReducer";
-import { usePlayback } from "../../player/PlayerProvider";
+import { usePlayback } from "../../player/playback";
 import { artistNames, decodeEntities, pickImage } from "../../utils/format";
 import { LikeButton } from "../LikeButton";
 import { ProgressBar } from "../NowPlaying";

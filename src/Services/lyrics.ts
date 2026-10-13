@@ -101,3 +101,12 @@ export const getLyrics = async (song: Song): Promise<Lyrics | null> => {
     .sort((a, b) => score(b) - score(a))[0];
   return best && score(best) >= 10 ? toLyrics(best) : null;
 };
+
+// Lines light up slightly early so they feel in time with the singing.
+const LEAD_SECONDS = 0.3;
+
+export const activeLineIndex = (lines: LyricLine[], time: number): number => {
+  let active = -1;
+  for (let i = 0; i < lines.length && lines[i].time <= time + LEAD_SECONDS; i++) active = i;
+  return active;
+};

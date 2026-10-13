@@ -28,7 +28,7 @@ export const ArtistLinks = ({ artists, className = '' }: { artists: Artists | un
   return (
     <span className={`artist-links ${className}`}>
       {list.map((artist, index) => (
-        <React.Fragment key={artist.id}>
+        <React.Fragment key={`${artist.id}-${index}`}>
           {index > 0 && ', '}
           <Link to={routes.artist(artist.id)}>{decodeEntities(artist.name)}</Link>
         </React.Fragment>

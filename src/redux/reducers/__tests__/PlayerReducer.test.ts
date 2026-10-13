@@ -5,10 +5,6 @@ import {
 } from "../PlayerReducer";
 import { Song } from "../../../Services/interfaces";
 
-jest.mock('../../../Services/songs', () => ({ searchSongs: jest.fn(), getSongSuggestions: jest.fn() }));
-jest.mock('../../../Services/album', () => ({ searchAlbums: jest.fn(), getAlbum: jest.fn() }));
-jest.mock('../../../Services/artist', () => ({ searchArtists: jest.fn(), getArtist: jest.fn() }));
-jest.mock('../../../Services/lyrics', () => ({ getLyrics: jest.fn() }));
 
 const song = (id: string): Song => ({ id, name: `Song ${id}` } as Song);
 const songs = (...ids: string[]) => ids.map(song);

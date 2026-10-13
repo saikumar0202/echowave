@@ -1,7 +1,4 @@
-import { cleanTitle, parseLrc } from "../lyrics";
-import { activeLineIndex } from "../../components/Lyrics";
-
-jest.mock('axios', () => ({ create: () => ({ get: jest.fn() }), isAxiosError: () => false }));
+import { activeLineIndex, cleanTitle, parseLrc } from "../lyrics";
 
 describe('lyrics helpers', () => {
   it('strips soundtrack and version suffixes from titles', () => {
