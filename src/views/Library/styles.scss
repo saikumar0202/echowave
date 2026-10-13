@@ -9,6 +9,12 @@
     flex-wrap: wrap;
   }
 
+  &__actions {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
   &__create {
     display: flex;
     align-items: center;

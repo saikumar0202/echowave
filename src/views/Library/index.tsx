@@ -4,6 +4,7 @@ import { useAppDispatch, useAppSelector } from "../../redux/store";
 import { createPlaylist } from "../../redux/reducers/LibraryReducer";
 import { PlaylistCover } from "../../components/PlaylistCover";
 import { routes } from "../../routes";
+import { useInstallPrompt } from "../../hooks/useInstallPrompt";
 import "../views.scss";
 import "./styles.scss";
 
@@ -13,6 +14,7 @@ export const Library = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const { liked, playlists } = useAppSelector((state) => state.library);
+  const install = useInstallPrompt();
   const [creating, setCreating] = useState(false);
   const [name, setName] = useState('');
 
@@ -29,11 +31,18 @@ export const Library = () => {
     <div className='view'>
       <header className='view__hero view__hero--compact library__header'>
         <h1 className='view__title'>Your library</h1>
-        {!creating && (
-          <button className='play-all' onClick={() => setCreating(true)}>
-            <i className='fa-solid fa-plus' /> New playlist
-          </button>
-        )}
+        <div className='library__actions'>
+          {install && (
+            <button className='text-button' onClick={install}>
+              <i className='fa-solid fa-download' /> Install app
+            </button>
+          )}
+          {!creating && (
+            <button className='play-all' onClick={() => setCreating(true)}>
+              <i className='fa-solid fa-plus' /> New playlist
+            </button>
+          )}
+        </div>
       </header>
 
       {creating && (

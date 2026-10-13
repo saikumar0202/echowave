@@ -9,6 +9,7 @@ import { NowPlaying } from "./components/NowPlaying";
 import { MiniPlayer } from "./components/MiniPlayer";
 import { QueuePanel } from "./components/QueuePanel";
 import { Toast } from "./components/Toast";
+import { useOnlineStatus } from "./hooks/useOnlineStatus";
 import { Discover } from "./views/Discover";
 import { Search } from "./views/Search";
 import { Liked } from "./views/Liked";
@@ -21,6 +22,7 @@ function App() {
   const dispatch = useAppDispatch();
   const { pathname } = useLocation();
   const mainRef = useRef<HTMLElement>(null);
+  const online = useOnlineStatus();
 
   // Load starter content on any entry page, so the player isn't empty
   // when the app is opened straight onto e.g. a playlist link.
@@ -39,6 +41,11 @@ function App() {
     <div className="app">
       <Sidebar />
       <main className='app__main' ref={mainRef}>
+        {!online && (
+          <div className='offline-banner' role='status'>
+            <i className='fa-solid fa-wifi' aria-hidden='true' /> You're offline. Showing saved pages; playing music needs a connection.
+          </div>
+        )}
         <Routes>
           <Route path='/' element={<Discover />} />
           <Route path='/search' element={<Search />} />
