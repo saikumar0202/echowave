@@ -5,11 +5,14 @@ A responsive music streaming web app built with React, TypeScript, Redux Toolkit
 ## Features
 
 - **Discover**: top albums, trending songs, and "You may like" suggestions based on the current song
-- **Search** songs and albums as you type
-- **Album pages** with Play and shuffle
-- **Liked songs**, saved in the browser (localStorage)
-- **Queue**: play from any list, add to queue, remove, clear, jump to a song
+- **Search** songs, albums and artists as you type; searches have shareable URLs
+- **Album and artist pages**, with links from every song
+- **Library**: liked songs and playlists (create, rename, reorder, delete), saved in the browser
+- **Song menu**: play next, add to queue, add to playlist, go to album or artist
+- **Queue**: drag to reorder (mouse, touch or keyboard), remove, clear, jump to a song
 - **Player**: shuffle, repeat (off / all / one), seek, volume, and auto-play of similar songs when the queue ends
+- **Synced lyrics** from [LRCLIB](https://lrclib.net), with tap-to-seek
+- **Installable app (PWA)** that opens offline and caches artwork and recent pages
 - **Mobile layout**: bottom tabs, mini player, full-screen now-playing sheet, safe-area aware
 - **Lock-screen and headphone controls** through the Media Session API
 - **Light and dark themes** that follow the system setting
@@ -56,20 +59,18 @@ VITE_API_HOST=https://your-api.example.com/api/ npm start
 ```
 src/
   Services/      API client and endpoint wrappers
-  redux/         Store and slices: player (queue), catalog, search, album, library, ui
+  redux/         Store and slices: player (queue), catalog, search, album, artist,
+                 library (liked + playlists), lyrics, ui
   player/        PlayerProvider: owns the <audio> element, media session, shortcuts
   components/    UI building blocks (SongList, NowPlaying, MiniPlayer, QueuePanel, ...)
-  views/         Pages: Discover, Search, Liked, AlbumPage
+  views/         Pages: Discover, Search, Library, Liked, Album, Artist, Playlist
+  hooks/         Install prompt and online status
   styles/        Design tokens and the light/dark theme
 ```
 
 ## Deployment
 
-`.github/workflows/deploy.yml` builds and publishes to GitHub Pages on every push to `main`. The deployed site can't reach `localhost`, so host the API somewhere public (it deploys to Vercel or Cloudflare Workers) and pass its URL at build time:
+- `.github/workflows/ci.yml` runs lint, tests and a production build on every pull request.
+- `.github/workflows/deploy.yml` runs the same checks, then builds and publishes to GitHub Pages on every push to `main`.
 
-```yaml
-- name: Build the React app
-  run: npm run build
-  env:
-    VITE_API_HOST: https://your-api.example.com/api/
-```
+The deployed site can't reach `localhost`, so host the API somewhere public (it deploys to Vercel or Cloudflare Workers), then add its URL as a repository variable named `VITE_API_HOST` (Settings → Secrets and variables → Actions → Variables), for example `https://your-api.example.com/api/`.

@@ -27,12 +27,22 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
+          cache: npm
 
       - name: Install dependencies
         run: npm ci
 
+      - name: Lint and test
+        run: |
+          npm run lint
+          npm test
+
+      # Set the API URL under Settings → Secrets and variables → Actions →
+      # Variables as VITE_API_HOST (e.g. https://your-api.example.com/api/).
       - name: Build the React app
         run: npm run build
+        env:
+          VITE_API_HOST: ${{ vars.VITE_API_HOST }}
 
       - name: Upload GitHub Pages artifact
         uses: actions/upload-pages-artifact@v3
