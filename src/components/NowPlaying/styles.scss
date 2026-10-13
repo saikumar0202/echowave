@@ -1,0 +1,290 @@
+@use "../../styles/tokens" as *;
+
+.now-playing {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 20px 24px 28px;
+  overflow: hidden auto;
+  background: $surface;
+
+  &--empty {
+    align-items: center;
+    justify-content: center;
+    color: $text-3;
+    text-align: center;
+    font-size: $font-sm;
+    i {
+      font-size: 40px;
+    }
+  }
+
+  // Soft color wash taken from the cover art.
+  // The blurred layer bleeds past its box, so clip it here rather than
+  // letting it make the panel scroll.
+  &__backdrop {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    overflow: hidden;
+    opacity: 0.28;
+    pointer-events: none;
+    background-size: 0;
+
+    &::before {
+      content: '';
+      position: absolute;
+      inset: -60px;
+      background-image: inherit;
+      background-size: cover;
+      background-position: center;
+      filter: blur(60px) saturate(1.4);
+    }
+  }
+
+  &__header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  &__heading {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  &__eyebrow {
+    font-size: $font-xs;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: $text-3;
+  }
+
+  &__album {
+    @include ellipsis;
+    font-size: $font-sm;
+    font-weight: 500;
+  }
+
+  &__icon-button {
+    @include icon-button(40px);
+    & {
+      position: relative;
+      font-size: $font-md;
+    }
+    &.is-active {
+      color: $accent-text;
+    }
+    &.is-active::after {
+      content: '';
+      position: absolute;
+      bottom: 3px;
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: currentColor;
+    }
+  }
+
+  &__close {
+    display: none;
+  }
+
+  &__art {
+    width: 100%;
+    max-width: 340px;
+    margin: 0 auto;
+    aspect-ratio: 1;
+    border-radius: $radius;
+    overflow: hidden;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.3);
+    background: $surface-2;
+    flex-shrink: 0;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  }
+
+  &__info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  &__titles {
+    flex: 1;
+    min-width: 0;
+  }
+
+  &__title {
+    @include ellipsis;
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+
+  &__artists {
+    @include ellipsis;
+    font-size: $font-md;
+    color: $text-2;
+  }
+
+  &__like {
+    font-size: 20px;
+  }
+
+  &__controls {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    max-width: 340px;
+    width: 100%;
+    margin: 0 auto;
+  }
+
+  &__skip {
+    font-size: 22px;
+    color: $text;
+  }
+
+  &__play {
+    @include reset-button;
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: $accent;
+    color: $on-accent;
+    font-size: 24px;
+    box-shadow: 0 8px 20px rgba(30, 215, 96, 0.35);
+    transition: transform 0.15s, filter 0.15s;
+    &:hover {
+      transform: scale(1.05);
+      filter: brightness(1.05);
+    }
+    &:active {
+      transform: scale(0.96);
+    }
+    .fa-play {
+      margin-left: 3px;
+    }
+  }
+
+  &__repeat-one {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    font-size: 9px;
+    font-weight: 700;
+  }
+
+  &__volume {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    max-width: 260px;
+    width: 100%;
+    margin: 0 auto;
+  }
+
+  // ---- Wide desktop: the queue has its own column, so hide its toggle.
+  @include wide {
+    &__queue-toggle {
+      display: none;
+    }
+  }
+
+  // ---- Phones: a full-screen sheet that slides up from the mini player.
+  @include mobile {
+    position: fixed;
+    inset: 0;
+    z-index: 40;
+    padding: calc(12px + env(safe-area-inset-top, 0px)) 24px calc(24px + env(safe-area-inset-bottom, 0px));
+    background: $bg;
+    gap: 16px;
+    transform: translateY(100%);
+    visibility: hidden;
+    transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), visibility 0s 0.3s;
+
+    &--open {
+      transform: none;
+      visibility: visible;
+      transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+
+    &--empty {
+      display: none;
+    }
+
+    &__backdrop {
+      opacity: 0.4;
+    }
+
+    &__close {
+      display: inline-flex;
+    }
+
+    &__heading {
+      align-items: center;
+      text-align: center;
+    }
+
+    &__art {
+      flex: 0 1 auto;
+      width: min(100%, 52vh);
+      max-width: none;
+    }
+
+    &__title {
+      font-size: $font-lg;
+    }
+
+    // Keep title, seek bar and controls together at the bottom, in thumb reach.
+    &__info {
+      margin-top: auto;
+    }
+
+    &__controls {
+      max-width: none;
+    }
+
+    // Phones control volume with hardware buttons.
+    &__volume {
+      display: none;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: none !important;
+  }
+}
+
+.progress {
+  &__times {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 6px;
+    font-size: $font-xs;
+    font-variant-numeric: tabular-nums;
+    color: $text-3;
+  }
+}
+
+.progress-compact {
+  height: 2px;
+  background: $surface-2;
+  &__fill {
+    height: 100%;
+    background: $accent;
+  }
+}

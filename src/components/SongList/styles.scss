@@ -1,7 +1,209 @@
-@import "../../styles/light/fonts";
-@import "../../styles/light/variables";
+@use "../../styles/tokens" as *;
+
 .song-list {
   list-style: none;
-  padding: 16px 8px;
+  padding: 0;
   margin: 0;
+}
+
+.song-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding-right: 8px;
+  border-radius: $radius;
+  transition: background-color 0.15s;
+
+  &:hover {
+    background-color: $surface;
+  }
+
+  &__main {
+    @include reset-button;
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px;
+    text-align: left;
+    border-radius: $radius;
+  }
+
+  &__lead {
+    position: relative;
+    flex-shrink: 0;
+    width: 44px;
+    height: 44px;
+    border-radius: $radius-sm;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      background: $surface-2;
+    }
+
+    &--index {
+      width: 28px;
+    }
+  }
+
+  &__number {
+    font-size: $font-sm;
+    font-variant-numeric: tabular-nums;
+    color: $text-3;
+  }
+
+  &__overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: $font-sm;
+    color: #fff;
+    background: rgba(0, 0, 0, 0.45);
+    opacity: 0;
+    transition: opacity 0.15s;
+  }
+
+  &__lead--index &__overlay {
+    color: $text;
+    background: $surface;
+  }
+
+  &:hover &__overlay,
+  &__main:focus-visible &__overlay,
+  &--active &__overlay {
+    opacity: 1;
+  }
+
+  &--active &__lead--index &__overlay {
+    color: $accent-text;
+  }
+
+  &__text {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  &__name {
+    @include ellipsis;
+    font-size: $font-md;
+    font-weight: 500;
+    color: $text;
+  }
+
+  &--active &__name {
+    color: $accent-text;
+  }
+
+  &__explicit {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    margin-right: 6px;
+    border-radius: 3px;
+    font-size: 10px;
+    font-weight: 600;
+    vertical-align: 2px;
+    background: $text-3;
+    color: $bg;
+  }
+
+  &__artists {
+    @include ellipsis;
+    font-size: $font-sm;
+    color: $text-2;
+  }
+
+  &__actions {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    flex-shrink: 0;
+  }
+
+  &__action {
+    @include icon-button(36px);
+    & {
+      font-size: $font-sm;
+    }
+  }
+
+  // Hide secondary actions until hover on pointer devices; liked songs keep
+  // their heart visible so state is always readable.
+  @media (hover: hover) {
+    &__action {
+      opacity: 0;
+    }
+    &:hover &__action,
+    &:focus-within &__action,
+    &__action--like.is-liked {
+      opacity: 1;
+    }
+  }
+
+  // On phones there is no hover, and space is tight: keep only the heart.
+  @include mobile {
+    &__action--queue,
+    &__duration {
+      display: none;
+    }
+  }
+
+  &__duration {
+    min-width: 40px;
+    text-align: right;
+    font-size: $font-sm;
+    font-variant-numeric: tabular-nums;
+    color: $text-3;
+  }
+}
+
+// Animated "now playing" bars.
+.equalizer {
+  display: inline-flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 14px;
+
+  span {
+    width: 3px;
+    height: 100%;
+    border-radius: 1px;
+    background: $accent;
+    animation: equalize 0.9s ease-in-out infinite;
+    &:nth-child(2) {
+      animation-delay: -0.3s;
+    }
+    &:nth-child(3) {
+      animation-delay: -0.6s;
+    }
+  }
+}
+
+@keyframes equalize {
+  0%, 100% { transform: scaleY(0.3); }
+  50% { transform: scaleY(1); }
+}
+
+.equalizer span {
+  transform-origin: bottom;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .equalizer span {
+    animation: none;
+    transform: scaleY(0.7);
+  }
 }

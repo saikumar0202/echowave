@@ -1,0 +1,93 @@
+// Design tokens. Colors live in CSS custom properties (see theme.scss) so the
+// whole app can switch between light and dark without recompiling.
+
+$bg: var(--bg);
+$surface: var(--surface);
+$surface-2: var(--surface-2);
+$border: var(--border);
+$text: var(--text);
+$text-2: var(--text-2);
+$text-3: var(--text-3);
+$accent: var(--accent);
+$accent-text: var(--accent-text);
+$on-accent: var(--on-accent);
+$overlay: var(--overlay);
+$shadow: var(--shadow);
+
+$font-xxl: 40px;
+$font-xl: 32px;
+$font-lg: 24px;
+$font-md: 16px;
+$font-sm: 14px;
+$font-xs: 12px;
+
+$radius-sm: 6px;
+$radius: 12px;
+$radius-lg: 20px;
+
+$sidebar-width: 72px;
+$player-width: 360px;
+$queue-width: 320px;
+$mini-player-height: 64px;
+$bottom-nav-height: 60px;
+
+// Below $bp-mobile the app switches to the phone layout (bottom nav,
+// mini player, full-screen now playing). Above $bp-wide the queue gets
+// its own column instead of a drawer.
+$bp-mobile: 900px;
+$bp-wide: 1280px;
+
+@mixin mobile {
+  @media (max-width: #{$bp-mobile - 1px}) {
+    @content;
+  }
+}
+
+@mixin desktop {
+  @media (min-width: $bp-mobile) {
+    @content;
+  }
+}
+
+@mixin wide {
+  @media (min-width: $bp-wide) {
+    @content;
+  }
+}
+
+@mixin ellipsis {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+@mixin reset-button {
+  appearance: none;
+  background: none;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+@mixin icon-button($size: 40px, $color: $text-2) {
+  @include reset-button;
+  width: $size;
+  height: $size;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  color: $color;
+  transition: background-color 0.15s, color 0.15s, transform 0.15s;
+  &:hover {
+    background-color: $surface-2;
+    color: $text;
+  }
+  &:active {
+    transform: scale(0.94);
+  }
+}

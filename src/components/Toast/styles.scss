@@ -1,0 +1,35 @@
+@use "../../styles/tokens" as *;
+
+.toast-region {
+  position: fixed;
+  left: 50%;
+  bottom: 24px;
+  transform: translateX(-50%);
+  z-index: 100;
+  pointer-events: none;
+  width: max-content;
+  max-width: calc(100vw - 32px);
+
+  @include mobile {
+    bottom: calc(#{$mini-player-height + $bottom-nav-height + 16px} + env(safe-area-inset-bottom, 0px));
+  }
+}
+
+.toast {
+  @include ellipsis;
+  padding: 10px 18px;
+  border-radius: 999px;
+  background: $text;
+  color: $bg;
+  font-size: $font-sm;
+  font-weight: 500;
+  box-shadow: $shadow;
+  animation: toast-in 0.2s ease-out;
+}
+
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}

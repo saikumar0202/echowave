@@ -1,37 +1,12 @@
 import { GET } from "./api";
-import { loading } from "../redux/reducers/LoadingReducer";
-import { setSearchedSongs, setSongSuggestions, setSongTrackList } from "../redux/reducers/SongReducer";
-import { Dispatch } from "@reduxjs/toolkit";
+import { SearchResults, Song } from "./interfaces";
 
-export const searchSongsByQuery = (query: string, dispatch: Dispatch, limit = 10, page = 0) => {
-  dispatch(loading(true));
-  GET("search/songs",
-    (res) => {
-      dispatch(loading(false));
-      dispatch(setSongTrackList(res?.data?.data?.results ?? []));
-      dispatch(setSearchedSongs(res?.data?.data?.results ?? []));
-    },
-    (err) => {
-      dispatch(loading(false));
-    },
-    {
-      query,
-      limit,
-      page
-    })
-}
-export const getSongSuggestionById = (id: string, dispatch: Dispatch, limit = 10, page = 0) => {
-  dispatch(loading(true));
-  GET("songs/"+id+"/suggestions",
-    (res) => {
-      dispatch(loading(false));
-      dispatch(setSongSuggestions(res?.data.data ?? []));
-    },
-    (err) => {
-      dispatch(loading(false));
-    },
-    {
-      limit,
-      page
-    })
-}
+export const searchSongs = async (query: string, limit = 10, page = 0): Promise<Song[]> => {
+  const data = await GET<SearchResults<Song>>("search/songs", { query, limit, page });
+  return data?.results ?? [];
+};
+
+export const getSongSuggestions = async (id: string, limit = 10): Promise<Song[]> => {
+  const data = await GET<Song[]>(`songs/${id}/suggestions`, { limit });
+  return data ?? [];
+};

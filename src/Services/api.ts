@@ -1,47 +1,23 @@
-import axios, { AxiosResponse } from "axios";
+import axios from "axios";
 
-const API_HOST = 'https://saavn.dev/api/';
+// Defaults to a locally running jiosaavn-api (see README). Override with
+// REACT_APP_API_HOST when building for a hosted API.
+export const API_HOST = process.env.REACT_APP_API_HOST ?? 'http://localhost:3001/api/';
 
-const headers = {
-  "Content-Type": "application/json",
-};
-// axios.defaults.withCredentials = true;
+const client = axios.create({
+  baseURL: API_HOST,
+  timeout: 15000,
+});
 
-function GET(
-  url: string,
-  successCallback: (arg0: AxiosResponse<any, any>) => void,
-  failureCallback: (arg0: any) => void,
-  params = {}
-) {
-  axios
-    .get(API_HOST + url, {
-      params: params,
-      headers,
-    })
-    .then((res) => {
-      successCallback(res);
-    })
-    .catch((err) => {
-      failureCallback(err);
-    });
+interface ApiResponse<T> {
+  success: boolean,
+  data: T,
 }
 
-function POST(
-  url: string,
-  body: any, successCallback: (arg0: AxiosResponse<any, any>) => void,
-  failureCallback: (arg0: any) => void,
-  params = {}
-) {
-  axios
-    .post(API_HOST + url, body, {
-      params: params,
-      headers,
-    })
-    .then((res) => {
-      successCallback(res);
-    })
-    .catch((err) => {
-      failureCallback(err);
-    });
+export async function GET<T>(url: string, params: Record<string, unknown> = {}): Promise<T> {
+  const res = await client.get<ApiResponse<T>>(url, { params });
+  if (!res.data?.success) {
+    throw new Error(`Request to ${url} failed`);
+  }
+  return res.data.data;
 }
-export { GET, POST };

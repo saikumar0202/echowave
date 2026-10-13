@@ -1,0 +1,120 @@
+@use "../../styles/tokens" as *;
+
+.queue {
+  display: flex;
+  flex-direction: column;
+  padding: 20px 12px 24px;
+  overflow-y: auto;
+  background: $bg;
+  border-left: 1px solid $border;
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 8px 12px;
+  }
+
+  &__title {
+    font-size: 22px;
+    font-weight: 700;
+  }
+
+  &__close {
+    @include icon-button(40px);
+  }
+
+  &__label-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-right: 8px;
+  }
+
+  &__label {
+    margin: 16px 8px 4px;
+    font-size: $font-xs;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: $text-3;
+  }
+
+  &__clear {
+    @include reset-button;
+    margin-top: 12px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: $font-xs;
+    font-weight: 600;
+    color: $text-2;
+    &:hover {
+      background: $surface;
+      color: $text;
+    }
+  }
+
+  &__hint {
+    padding: 8px;
+    font-size: $font-sm;
+    color: $text-3;
+  }
+
+  // Wide desktop: a permanent column, no close button.
+  @include wide {
+    &__close {
+      display: none;
+    }
+  }
+
+  // Everything narrower: a drawer that slides in from the right.
+  @media (max-width: #{$bp-wide - 1px}) {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 50;
+    width: min(400px, 100%);
+    padding-top: calc(20px + env(safe-area-inset-top, 0px));
+    padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+    box-shadow: $shadow;
+    transform: translateX(100%);
+    visibility: hidden;
+    transition: transform 0.25s ease-out, visibility 0s 0.25s;
+
+    &--open {
+      transform: none;
+      visibility: visible;
+      transition: transform 0.25s ease-out;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: none !important;
+  }
+}
+
+.queue-scrim {
+  display: none;
+
+  @media (max-width: #{$bp-wide - 1px}) {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 45;
+    background: $overlay;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s;
+
+    &--open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+  }
+}
+
+// The column is narrow; give song names the room instead of durations.
+.queue .song-row__duration {
+  display: none;
+}

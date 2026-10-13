@@ -81,3 +81,9 @@ export interface Song extends Name {
   image: URLFormat[],
   downloadUrl: URLFormat[]
 }
+
+export interface SearchResults<T> {
+  total: number,
+  start: number,
+  results: T[]
+}

@@ -1,25 +1,38 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { Album } from "../../Services/interfaces";
+import { getAlbum } from "../../Services/album";
+import type { Status } from "./CatalogReducer";
 
-const initialState: {
-  searchedAlbums: Album[],
-  topCharts: Album[]
-} = {
-  searchedAlbums: [],
-  topCharts: []
+interface AlbumState {
+  album: Album | null,
+  status: Status,
 }
+
+const initialState: AlbumState = {
+  album: null,
+  status: 'idle',
+};
+
+export const loadAlbum = createAsyncThunk('album/load', (id: string) => getAlbum(id));
+
 const albumSlice = createSlice({
-  name: "loading",
+  name: "album",
   initialState,
-  reducers: {
-    setSearchedAlbums: (state, action:PayloadAction<Album[]>) => {
-      state.searchedAlbums = action.payload;
-    },
-    setTopCharts: (state, action:PayloadAction<Album[]>) => {
-      state.topCharts = action.payload;
-    },
+  reducers: {},
+  extraReducers: (builder) => {
+    builder
+      .addCase(loadAlbum.pending, (state) => {
+        state.status = 'loading';
+        state.album = null;
+      })
+      .addCase(loadAlbum.fulfilled, (state, action) => {
+        state.status = 'ready';
+        state.album = action.payload;
+      })
+      .addCase(loadAlbum.rejected, (state) => {
+        state.status = 'error';
+      });
   },
 });
 
-export const { setSearchedAlbums, setTopCharts} = albumSlice.actions;
 export default albumSlice.reducer;

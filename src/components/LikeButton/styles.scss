@@ -1,0 +1,22 @@
+@use "../../styles/tokens" as *;
+
+.like-button {
+  @include icon-button(40px);
+
+  &.is-liked {
+    color: $accent-text;
+    i {
+      animation: like-pop 0.3s ease-out;
+    }
+  }
+}
+
+@keyframes like-pop {
+  50% { transform: scale(1.3); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .like-button.is-liked i {
+    animation: none;
+  }
+}

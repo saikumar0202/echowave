@@ -1,12 +1,17 @@
 import { combineReducers } from '@reduxjs/toolkit'
-import SongReducer from "./SongReducer";
-import LoadingReducer from "./LoadingReducer";
+import PlayerReducer from "./PlayerReducer";
+import CatalogReducer from "./CatalogReducer";
+import SearchReducer from "./SearchReducer";
 import AlbumReducer from "./AlbumReducer";
+import LibraryReducer from "./LibraryReducer";
+import UIReducer from "./UIReducer";
+
 export const rootReducer = combineReducers({
-  songs: SongReducer,
-  loader: LoadingReducer,
-  album: AlbumReducer
-  // login: LoginReducer,
-  // loader: loadingSlice,
+  player: PlayerReducer,
+  catalog: CatalogReducer,
+  search: SearchReducer,
+  album: AlbumReducer,
+  library: LibraryReducer,
+  ui: UIReducer,
 })
 export type RootState = ReturnType<typeof rootReducer>

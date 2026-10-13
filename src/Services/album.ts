@@ -1,21 +1,9 @@
-import { Dispatch } from "@reduxjs/toolkit";
-import { loading } from "../redux/reducers/LoadingReducer";
 import { GET } from "./api";
-import { setSearchedAlbums } from "../redux/reducers/AlbumReducer";
+import { Album, SearchResults } from "./interfaces";
 
-export const searchAlbumsByQuery = (query: string, dispatch: Dispatch, limit = 10, page = 0) => {
-  dispatch(loading(true));
-  GET("search/albums",
-    (res) => {
-      dispatch(loading(false));
-      dispatch(setSearchedAlbums(res?.data?.data?.results ?? []));
-    },
-    (err) => {
-      dispatch(loading(false));
-    },
-    {
-      query,
-      limit,
-      page
-    })
-}
+export const searchAlbums = async (query: string, limit = 10, page = 0): Promise<Album[]> => {
+  const data = await GET<SearchResults<Album>>("search/albums", { query, limit, page });
+  return data?.results ?? [];
+};
+
+export const getAlbum = (id: string): Promise<Album> => GET<Album>("albums", { id });

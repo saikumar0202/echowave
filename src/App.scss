@@ -1,21 +1,35 @@
-.App {
-  display: flex;
+@use "./styles/tokens" as *;
+
+// Desktop:      sidebar | page | now playing        (queue is a drawer)
+// Wide desktop: sidebar | page | now playing | queue
+// Phone:        page, with mini player + bottom nav; player and queue are sheets
+.app {
+  display: grid;
+  grid-template-columns: $sidebar-width minmax(0, 1fr) $player-width;
   height: 100vh;
+  height: 100dvh;
   overflow: hidden;
-}
-.sidebar {
-  width: 54px;
-}
-.main-container {
-  display: flex;
-  flex: 1;
-  width: calc(100% - 54px) // sidebar
-}
-.player-section {
-  flex: 40%;
-}
-.track-section {
-  flex: 30%;
-  width: 296px;
-  overflow-y: auto;
+
+  @include wide {
+    grid-template-columns: $sidebar-width minmax(0, 1fr) $player-width $queue-width;
+  }
+
+  @include mobile {
+    display: block;
+    height: auto;
+    min-height: 100dvh;
+    overflow: visible;
+  }
+
+  &__main {
+    min-width: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+
+    @include mobile {
+      overflow: visible;
+      // Room for the mini player and bottom nav.
+      padding-bottom: calc(#{$mini-player-height + $bottom-nav-height + 16px} + env(safe-area-inset-bottom, 0px));
+    }
+  }
 }
