@@ -1,6 +1,8 @@
 import React, { useEffect, useRef } from 'react';
+import { Navigate, Route, Routes, useLocation } from "react-router-dom";
 import './App.scss';
-import { useAppSelector } from "./redux/store";
+import { useAppDispatch } from "./redux/store";
+import { closeOverlays } from "./redux/reducers/UIReducer";
 import { Sidebar, BottomNav } from "./components/Sidebar";
 import { NowPlaying } from "./components/NowPlaying";
 import { MiniPlayer } from "./components/MiniPlayer";
@@ -10,35 +12,32 @@ import { Discover } from "./views/Discover";
 import { Search } from "./views/Search";
 import { Liked } from "./views/Liked";
 import { AlbumPage } from "./views/AlbumPage";
-
-const CurrentView = () => {
-  const view = useAppSelector((state) => state.ui.view);
-  switch (view.name) {
-    case 'search':
-      return <Search />;
-    case 'liked':
-      return <Liked />;
-    case 'album':
-      return <AlbumPage id={view.id} />;
-    default:
-      return <Discover />;
-  }
-};
+import { ArtistPage } from "./views/ArtistPage";
 
 function App() {
-  const view = useAppSelector((state) => state.ui.view);
+  const dispatch = useAppDispatch();
+  const { pathname } = useLocation();
   const mainRef = useRef<HTMLElement>(null);
 
-  // Each page starts at the top.
+  // Each page starts at the top, and navigating closes the player sheet/queue.
   useEffect(() => {
     mainRef.current?.scrollTo({ top: 0 });
-  }, [view]);
+    window.scrollTo({ top: 0 });
+    dispatch(closeOverlays());
+  }, [pathname, dispatch]);
 
   return (
     <div className="app">
       <Sidebar />
       <main className='app__main' ref={mainRef}>
-        <CurrentView />
+        <Routes>
+          <Route path='/' element={<Discover />} />
+          <Route path='/search' element={<Search />} />
+          <Route path='/liked' element={<Liked />} />
+          <Route path='/album/:id' element={<AlbumPage />} />
+          <Route path='/artist/:id' element={<ArtistPage />} />
+          <Route path='*' element={<Navigate to='/' replace />} />
+        </Routes>
       </main>
       <NowPlaying />
       <QueuePanel />

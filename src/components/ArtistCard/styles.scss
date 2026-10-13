@@ -1,0 +1,88 @@
+@use "../../styles/tokens" as *;
+
+.artist-card {
+  min-width: 0;
+
+  &__link {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    padding: 8px;
+    border-radius: $radius;
+    text-align: center;
+    text-decoration: none;
+    color: inherit;
+    transition: background-color 0.15s;
+    &:hover {
+      background: $surface;
+    }
+  }
+
+  &__image {
+    width: 100%;
+    aspect-ratio: 1;
+    margin-bottom: 8px;
+    border-radius: 50%;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: $surface-2;
+    color: $text-3;
+    font-size: 32px;
+    box-shadow: $shadow;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  }
+
+  &__name {
+    @include ellipsis;
+    max-width: 100%;
+    font-size: $font-sm;
+    font-weight: 600;
+  }
+
+  &__type {
+    font-size: $font-xs;
+    color: $text-3;
+  }
+}
+
+.artist-row {
+  list-style: none;
+  margin: 0 -8px;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 4px;
+
+  @include mobile {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    margin: 0 -16px;
+    padding: 0 8px;
+    &::-webkit-scrollbar {
+      display: none;
+    }
+    .artist-card {
+      flex: 0 0 34%;
+      scroll-snap-align: start;
+    }
+  }
+}
+
+.artist-links a {
+  color: inherit;
+  text-decoration: none;
+  &:hover {
+    text-decoration: underline;
+    color: $text;
+  }
+}

@@ -1,44 +1,37 @@
 import * as React from 'react';
+import { NavLink } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../redux/store";
-import { navigate, setQueueOpen, View } from "../../redux/reducers/UIReducer";
+import { setQueueOpen } from "../../redux/reducers/UIReducer";
+import { routes } from "../../routes";
 import './styles.scss';
 
-export const NAV_ITEMS: { view: View, label: string, icon: string }[] = [
-  { view: { name: 'discover' }, label: 'Discover', icon: 'fa-solid fa-compass' },
-  { view: { name: 'search' }, label: 'Search', icon: 'fa-solid fa-magnifying-glass' },
-  { view: { name: 'liked' }, label: 'Liked', icon: 'fa-solid fa-heart' },
+export const NAV_ITEMS: { to: string, label: string, icon: string, end?: boolean }[] = [
+  { to: routes.discover(), label: 'Discover', icon: 'fa-solid fa-compass', end: true },
+  { to: routes.search(), label: 'Search', icon: 'fa-solid fa-magnifying-glass' },
+  { to: routes.liked(), label: 'Liked', icon: 'fa-solid fa-heart' },
 ];
 
-const useNav = () => {
+const useQueueToggle = () => {
   const dispatch = useAppDispatch();
-  const current = useAppSelector((state) => state.ui.view.name);
   const queueOpen = useAppSelector((state) => state.ui.queueOpen);
-  const likedCount = useAppSelector((state) => state.library.liked.length);
-  return {
-    current,
-    queueOpen,
-    likedCount,
-    go: (view: View) => dispatch(navigate(view)),
-    toggleQueue: () => dispatch(setQueueOpen(!queueOpen)),
-  };
+  return { queueOpen, toggleQueue: () => dispatch(setQueueOpen(!queueOpen)) };
 };
 
 export const Sidebar = () => {
-  const { current, go, toggleQueue, queueOpen } = useNav();
+  const { queueOpen, toggleQueue } = useQueueToggle();
   return (
     <nav className='sidebar' aria-label='Main'>
-      <div className='sidebar__logo' aria-label='EchoWave'>
+      <NavLink to={routes.discover()} className='sidebar__logo' aria-label='EchoWave home'>
         <i className='fa-solid fa-wave-square' aria-hidden='true' />
-      </div>
+      </NavLink>
       <ul className='sidebar__items'>
         {NAV_ITEMS.map((item) => (
-          <li key={item.view.name}>
-            <button className={`sidebar__item ${current === item.view.name ? 'is-active' : ''}`}
-                    onClick={() => go(item.view)} aria-current={current === item.view.name ? 'page' : undefined}
-                    aria-label={item.label}>
+          <li key={item.to}>
+            <NavLink to={item.to} end={item.end} aria-label={item.label}
+                     className={({ isActive }) => `sidebar__item ${isActive ? 'is-active' : ''}`}>
               <i className={item.icon} aria-hidden='true' />
               <span className='sidebar__label'>{item.label}</span>
-            </button>
+            </NavLink>
           </li>
         ))}
         <li className='sidebar__queue'>
@@ -54,18 +47,19 @@ export const Sidebar = () => {
 };
 
 export const BottomNav = () => {
-  const { current, go, toggleQueue, queueOpen, likedCount } = useNav();
+  const { queueOpen, toggleQueue } = useQueueToggle();
+  const likedCount = useAppSelector((state) => state.library.liked.length);
   return (
     <nav className='bottom-nav' aria-label='Main'>
       {NAV_ITEMS.map((item) => (
-        <button key={item.view.name} className={`bottom-nav__item ${current === item.view.name && !queueOpen ? 'is-active' : ''}`}
-                onClick={() => go(item.view)} aria-current={current === item.view.name ? 'page' : undefined}>
+        <NavLink key={item.to} to={item.to} end={item.end}
+                 className={({ isActive }) => `bottom-nav__item ${isActive && !queueOpen ? 'is-active' : ''}`}>
           <span className='bottom-nav__icon'>
             <i className={item.icon} aria-hidden='true' />
-            {item.view.name === 'liked' && likedCount > 0 && <span className='bottom-nav__badge'>{likedCount}</span>}
+            {item.to === routes.liked() && likedCount > 0 && <span className='bottom-nav__badge'>{likedCount}</span>}
           </span>
           <span>{item.label}</span>
-        </button>
+        </NavLink>
       ))}
       <button className={`bottom-nav__item ${queueOpen ? 'is-active' : ''}`} onClick={toggleQueue} aria-expanded={queueOpen}>
         <span className='bottom-nav__icon'><i className='fa-solid fa-list-ul' aria-hidden='true' /></span>

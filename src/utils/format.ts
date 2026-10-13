@@ -39,6 +39,10 @@ export const pickAudio = (urls: URLFormat[] | undefined, preferred = '160kbps'):
   return (urls.find((u) => u.quality === preferred) ?? urls[urls.length - 1]).url;
 };
 
+const compactFormatter = new Intl.NumberFormat('en', { notation: 'compact', maximumFractionDigits: 1 });
+
+export const compactNumber = (value: number): string => compactFormatter.format(value);
+
 export const greeting = (date = new Date()): string => {
   const hour = date.getHours();
   if (hour < 5) return 'Good night';

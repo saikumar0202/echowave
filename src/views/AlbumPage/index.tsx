@@ -1,15 +1,18 @@
 import React, { useEffect } from "react";
+import { useParams } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../redux/store";
 import { loadAlbum } from "../../redux/reducers/AlbumReducer";
 import { playSongs, toggleShuffle } from "../../redux/reducers/PlayerReducer";
-import { goBack } from "../../redux/reducers/UIReducer";
+import { BackButton } from "../../components/BackButton";
 import { SongList } from "../../components/SongList";
 import { PlayAllButton } from "../../components/Section";
 import { ApiError, SongListSkeleton } from "../../components/Status";
-import { artistNames, decodeEntities, formatTime, pickImage } from "../../utils/format";
+import { ArtistLinks } from "../../components/ArtistCard";
+import { decodeEntities, formatTime, pickImage } from "../../utils/format";
 import "../views.scss";
 
-export const AlbumPage = ({ id }: { id: string }) => {
+export const AlbumPage = () => {
+  const { id = '' } = useParams();
   const dispatch = useAppDispatch();
   const { album, status } = useAppSelector((state) => state.album);
   const shuffle = useAppSelector((state) => state.player.shuffle);
@@ -23,9 +26,7 @@ export const AlbumPage = ({ id }: { id: string }) => {
 
   return (
     <div className='view'>
-      <button className='view__back' onClick={() => dispatch(goBack())} aria-label='Back'>
-        <i className='fa-solid fa-arrow-left' />
-      </button>
+      <BackButton />
 
       {status === 'error' && <ApiError onRetry={() => dispatch(loadAlbum(id))} />}
       {status === 'loading' && (
@@ -48,7 +49,7 @@ export const AlbumPage = ({ id }: { id: string }) => {
               <p className='view__eyebrow'>{album.type === 'album' ? 'Album' : album.type}</p>
               <h1 className='view__title'>{decodeEntities(album.name)}</h1>
               <p className='collection-hero__meta'>
-                {artistNames(album.artists)}
+                <ArtistLinks artists={album.artists} />
                 {album.year ? ` · ${album.year}` : ''}
                 {` · ${songs.length} ${songs.length === 1 ? 'song' : 'songs'}`}
                 {totalSeconds > 0 ? ` · ${formatTime(totalSeconds)}` : ''}

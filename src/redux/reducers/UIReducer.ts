@@ -1,15 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-export type View =
-  | { name: 'discover' }
-  | { name: 'search' }
-  | { name: 'liked' }
-  | { name: 'album', id: string };
-
 interface UIState {
-  view: View,
-  // Previous view, so the album page can go "back".
-  previousView: View | null,
   // Full-screen now playing sheet (phone layout only).
   nowPlayingOpen: boolean,
   // Queue drawer (everything narrower than the wide layout).
@@ -18,8 +9,6 @@ interface UIState {
 }
 
 const initialState: UIState = {
-  view: { name: 'discover' },
-  previousView: null,
   nowPlayingOpen: false,
   queueOpen: false,
   toast: null,
@@ -29,15 +18,9 @@ const uiSlice = createSlice({
   name: "ui",
   initialState,
   reducers: {
-    navigate: (state, action: PayloadAction<View>) => {
-      state.previousView = state.view;
-      state.view = action.payload;
+    closeOverlays: (state) => {
       state.nowPlayingOpen = false;
       state.queueOpen = false;
-    },
-    goBack: (state) => {
-      state.view = state.previousView ?? { name: 'discover' };
-      state.previousView = null;
     },
     setNowPlayingOpen: (state, action: PayloadAction<boolean>) => {
       state.nowPlayingOpen = action.payload;
@@ -57,5 +40,5 @@ const uiSlice = createSlice({
   },
 });
 
-export const { navigate, goBack, setNowPlayingOpen, setQueueOpen, showToast, hideToast } = uiSlice.actions;
+export const { closeOverlays, setNowPlayingOpen, setQueueOpen, showToast, hideToast } = uiSlice.actions;
 export default uiSlice.reducer;

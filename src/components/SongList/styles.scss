@@ -7,10 +7,11 @@
 }
 
 .song-row {
+  position: relative;
   display: flex;
   align-items: center;
-  gap: 4px;
-  padding-right: 8px;
+  gap: 12px;
+  padding: 8px;
   border-radius: $radius;
   transition: background-color 0.15s;
 
@@ -18,16 +19,26 @@
     background-color: $surface;
   }
 
-  &__main {
+  &__hit {
     @include reset-button;
-    flex: 1;
-    min-width: 0;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 8px;
-    text-align: left;
+    position: absolute;
+    inset: 0;
     border-radius: $radius;
+    &:focus-visible {
+      outline-offset: -2px;
+    }
+  }
+
+  // Visual content lets clicks through to the hit area, except links.
+  &__lead,
+  &__text {
+    pointer-events: none;
+  }
+
+  &__artists a,
+  &__actions {
+    position: relative;
+    pointer-events: auto;
   }
 
   &__lead {
@@ -78,7 +89,7 @@
   }
 
   &:hover &__overlay,
-  &__main:focus-visible &__overlay,
+  &__hit:focus-visible ~ &__lead &__overlay,
   &--active &__overlay {
     opacity: 1;
   }
@@ -88,6 +99,7 @@
   }
 
   &__text {
+    flex: 1;
     min-width: 0;
     display: flex;
     flex-direction: column;

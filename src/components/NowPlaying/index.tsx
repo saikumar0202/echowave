@@ -5,6 +5,7 @@ import { setNowPlayingOpen, setQueueOpen } from "../../redux/reducers/UIReducer"
 import { usePlayback } from "../../player/PlayerProvider";
 import { artistNames, decodeEntities, formatTime, pickImage } from "../../utils/format";
 import { LikeButton } from "../LikeButton";
+import { ArtistLinks } from "../ArtistCard";
 import './styles.scss';
 
 const REPEAT_LABELS = { off: 'Repeat off', all: 'Repeat all', one: 'Repeat one' };
@@ -87,7 +88,7 @@ export const NowPlaying = () => {
       <div className='now-playing__info'>
         <div className='now-playing__titles'>
           <h2 className='now-playing__title' title={name}>{name}</h2>
-          <p className='now-playing__artists' title={artists}>{artists}</p>
+          <p className='now-playing__artists' title={artists}><ArtistLinks artists={song.artists} /></p>
         </div>
         <LikeButton song={song} className='now-playing__like' />
       </div>

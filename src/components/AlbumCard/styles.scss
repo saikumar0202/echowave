@@ -5,6 +5,7 @@
 
   &__button {
     @include reset-button;
+    text-decoration: none;
     width: 100%;
     display: flex;
     flex-direction: column;

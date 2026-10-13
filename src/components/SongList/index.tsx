@@ -5,6 +5,7 @@ import { addToQueue, playSongs, selectCurrentSong, togglePlaying } from "../../r
 import { showToast } from "../../redux/reducers/UIReducer";
 import { artistNames, decodeEntities, formatTime, pickImage } from "../../utils/format";
 import { LikeButton } from "../LikeButton";
+import { ArtistLinks } from "../ArtistCard";
 import './styles.scss';
 
 interface SongListProps {
@@ -49,26 +50,26 @@ export const SongList = ({ songs, variant = 'art', onPlay, onRemove, activeIndex
         return (
           <li key={`${song.id}-${index}`}
               className={`song-row ${isActive ? 'song-row--active' : ''} ${isActive && isPlaying ? 'song-row--playing' : ''}`}>
-            <button className='song-row__main' onClick={() => handlePlay(index)}
-                    aria-label={`${isActive && isPlaying ? 'Pause' : 'Play'} ${name} by ${artists}`}>
-              <span className={`song-row__lead song-row__lead--${variant}`}>
-                {variant === 'art'
-                  ? <img src={pickImage(song.image, 'small')} alt='' loading='lazy' width={44} height={44} />
-                  : <span className='song-row__number'>{index + 1}</span>}
-                <span className='song-row__overlay' aria-hidden='true'>
-                  {isActive && isPlaying
-                    ? <span className='equalizer'><span /><span /><span /></span>
-                    : <i className='fa-solid fa-play' />}
-                </span>
+            {/* Full-row hit area; artist links and actions sit above it. */}
+            <button className='song-row__hit' onClick={() => handlePlay(index)}
+                    aria-label={`${isActive && isPlaying ? 'Pause' : 'Play'} ${name} by ${artists}`} />
+            <span className={`song-row__lead song-row__lead--${variant}`} aria-hidden='true'>
+              {variant === 'art'
+                ? <img src={pickImage(song.image, 'small')} alt='' loading='lazy' width={44} height={44} />
+                : <span className='song-row__number'>{index + 1}</span>}
+              <span className='song-row__overlay'>
+                {isActive && isPlaying
+                  ? <span className='equalizer'><span /><span /><span /></span>
+                  : <i className='fa-solid fa-play' />}
               </span>
-              <span className='song-row__text'>
-                <span className='song-row__name' title={name}>
-                  {song.explicitContent && <span className='song-row__explicit' title='Explicit'>E</span>}
-                  {name}
-                </span>
-                <span className='song-row__artists' title={artists}>{artists}</span>
+            </span>
+            <span className='song-row__text'>
+              <span className='song-row__name' title={name}>
+                {song.explicitContent && <span className='song-row__explicit' title='Explicit'>E</span>}
+                {name}
               </span>
-            </button>
+              <ArtistLinks artists={song.artists} className='song-row__artists' />
+            </span>
             <div className='song-row__actions'>
               <LikeButton song={song} className='song-row__action song-row__action--like' />
               {onRemove ? (
