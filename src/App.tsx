@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { Navigate, Route, Routes, useLocation } from "react-router-dom";
 import './App.scss';
-import { useAppDispatch } from "./redux/store";
+import { useAppDispatch, useAppSelector } from "./redux/store";
 import { closeOverlays } from "./redux/reducers/UIReducer";
 import { loadDiscover } from "./redux/reducers/CatalogReducer";
 import { Sidebar, BottomNav } from "./components/Sidebar";
@@ -9,6 +9,7 @@ import { NowPlaying } from "./components/NowPlaying";
 import { MiniPlayer } from "./components/MiniPlayer";
 import { QueuePanel } from "./components/QueuePanel";
 import { Toast } from "./components/Toast";
+import { FullscreenPlayer } from "./components/FullscreenPlayer";
 import { useOnlineStatus } from "./hooks/useOnlineStatus";
 import { Discover } from "./views/Discover";
 import { Search } from "./views/Search";
@@ -23,6 +24,7 @@ function App() {
   const { pathname } = useLocation();
   const mainRef = useRef<HTMLElement>(null);
   const online = useOnlineStatus();
+  const fullscreenOpen = useAppSelector((state) => state.ui.fullscreenOpen);
 
   // Load starter content on any entry page, so the player isn't empty
   // when the app is opened straight onto e.g. a playlist link.
@@ -61,6 +63,7 @@ function App() {
       <QueuePanel />
       <MiniPlayer />
       <BottomNav />
+      {fullscreenOpen && <FullscreenPlayer />}
       <Toast />
     </div>
   );

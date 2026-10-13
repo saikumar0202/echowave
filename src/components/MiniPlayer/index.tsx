@@ -5,7 +5,7 @@ import { setNowPlayingOpen } from "../../redux/reducers/UIReducer";
 import { usePlayback } from "../../player/playback";
 import { artistNames, decodeEntities, pickImage } from "../../utils/format";
 import { LikeButton } from "../LikeButton";
-import { ProgressBar } from "../NowPlaying";
+import { ProgressBar } from "../PlayerControls";
 import './styles.scss';
 
 // Phone-only bar above the bottom navigation; tapping it opens the

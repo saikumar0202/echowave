@@ -5,6 +5,8 @@ interface UIState {
   nowPlayingOpen: boolean,
   // Queue drawer (everything narrower than the wide layout).
   queueOpen: boolean,
+  // Immersive full-screen player (desktop).
+  fullscreenOpen: boolean,
   // Lyrics replace the cover art in the player.
   lyricsOpen: boolean,
   toast: { id: number, message: string } | null,
@@ -13,6 +15,7 @@ interface UIState {
 const initialState: UIState = {
   nowPlayingOpen: false,
   queueOpen: false,
+  fullscreenOpen: false,
   lyricsOpen: false,
   toast: null,
 };
@@ -24,12 +27,16 @@ const uiSlice = createSlice({
     closeOverlays: (state) => {
       state.nowPlayingOpen = false;
       state.queueOpen = false;
+      state.fullscreenOpen = false;
     },
     setNowPlayingOpen: (state, action: PayloadAction<boolean>) => {
       state.nowPlayingOpen = action.payload;
     },
     setQueueOpen: (state, action: PayloadAction<boolean>) => {
       state.queueOpen = action.payload;
+    },
+    setFullscreenOpen: (state, action: PayloadAction<boolean>) => {
+      state.fullscreenOpen = action.payload;
     },
     toggleLyrics: (state) => {
       state.lyricsOpen = !state.lyricsOpen;
@@ -46,5 +53,5 @@ const uiSlice = createSlice({
   },
 });
 
-export const { closeOverlays, setNowPlayingOpen, setQueueOpen, toggleLyrics, showToast, hideToast } = uiSlice.actions;
+export const { closeOverlays, setNowPlayingOpen, setQueueOpen, setFullscreenOpen, toggleLyrics, showToast, hideToast } = uiSlice.actions;
 export default uiSlice.reducer;

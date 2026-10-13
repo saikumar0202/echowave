@@ -1,0 +1,116 @@
+@use "../../styles/tokens" as *;
+
+.transport {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 340px;
+  margin: 0 auto;
+
+  &__button {
+    @include icon-button(40px);
+    & {
+      position: relative;
+      font-size: $font-md;
+    }
+    &.is-active {
+      color: $accent-text;
+    }
+    &.is-active::after {
+      content: '';
+      position: absolute;
+      bottom: 3px;
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: currentColor;
+    }
+  }
+
+  &__skip {
+    font-size: 22px;
+    color: $text;
+  }
+
+  &__play {
+    @include reset-button;
+    & {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: $accent;
+      color: $on-accent;
+      font-size: 24px;
+      box-shadow: 0 8px 20px rgba(30, 215, 96, 0.35);
+      transition: transform 0.15s, filter 0.15s;
+    }
+    &:hover {
+      transform: scale(1.05);
+      filter: brightness(1.05);
+    }
+    &:active {
+      transform: scale(0.96);
+    }
+    .fa-play {
+      margin-left: 3px;
+    }
+  }
+
+  &__repeat-one {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    font-size: 9px;
+    font-weight: 700;
+  }
+
+  &--large {
+    max-width: 420px;
+
+    .transport__button {
+      width: 48px;
+      height: 48px;
+      font-size: 18px;
+    }
+    .transport__skip {
+      font-size: 26px;
+    }
+    .transport__play {
+      width: 76px;
+      height: 76px;
+      font-size: 28px;
+    }
+  }
+}
+
+.volume {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  max-width: 260px;
+  width: 100%;
+}
+
+.progress {
+  &__times {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 6px;
+    font-size: $font-xs;
+    font-variant-numeric: tabular-nums;
+    color: $text-3;
+  }
+}
+
+.progress-compact {
+  height: 2px;
+  background: $surface-2;
+  &__fill {
+    height: 100%;
+    background: $accent;
+  }
+}

@@ -13,10 +13,11 @@ A responsive music streaming web app built with React, TypeScript, Redux Toolkit
 - **Player**: shuffle, repeat (off / all / one), seek, volume, and auto-play of similar songs when the queue ends
 - **Synced lyrics** from [LRCLIB](https://lrclib.net), with tap-to-seek
 - **Installable app (PWA)** that opens offline and caches artwork and recent pages
+- **Full-screen "Stage" player** on desktop: cover art on a spinning record, synced lyrics or up next in a side panel, controls that fade when idle
 - **Mobile layout**: bottom tabs, mini player, full-screen now-playing sheet, safe-area aware
 - **Lock-screen and headphone controls** through the Media Session API
 - **Light and dark themes** that follow the system setting
-- **Keyboard shortcuts**: `Space` play/pause, `Shift+←/→` previous/next, `M` mute
+- **Keyboard shortcuts**: `Space` play/pause, `Shift+←/→` previous/next, `M` mute, `F` full screen
 
 ## Getting started
 

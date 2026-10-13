@@ -4,6 +4,7 @@ import { AppStore, useAppDispatch, useAppSelector } from "../redux/store";
 import { playNext, previous, selectCurrentSong, setPlaying, togglePlaying } from "../redux/reducers/PlayerReducer";
 import { loadSuggestions } from "../redux/reducers/CatalogReducer";
 import { showToast } from "../redux/reducers/UIReducer";
+import { enterFullscreen, exitFullscreen } from "./fullscreen";
 import { artistNames, decodeEntities, pickAudio } from "../utils/format";
 import { PlaybackContext, PlaybackContextValue } from "./playback";
 
@@ -168,7 +169,7 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
       : 'EchoWave';
   }, [song, isPlaying]);
 
-  // Space: play/pause, Shift+←/→: previous/next, M: mute.
+  // Space: play/pause, Shift+←/→: previous/next, M: mute, F: full screen.
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
       if (isTypingTarget(event.target) || event.metaKey || event.ctrlKey || event.altKey) return;
@@ -181,11 +182,15 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
         prev();
       } else if (event.key === 'm' || event.key === 'M') {
         toggleMute();
+      } else if ((event.key === 'f' || event.key === 'F') && window.matchMedia('(min-width: 900px)').matches) {
+        // Full screen is a desktop feature; phones already get a full-screen sheet.
+        if (store.getState().ui.fullscreenOpen) exitFullscreen(dispatch);
+        else if (selectCurrentSong(store.getState())) enterFullscreen(dispatch);
       }
     };
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
-  }, [toggle, next, prev, toggleMute]);
+  }, [toggle, next, prev, toggleMute, dispatch, store]);
 
   const value = useMemo<PlaybackContextValue>(() => ({
     currentTime, duration, volume, muted, toggle, seek, setVolume, toggleMute, next, prev,
