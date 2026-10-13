@@ -18,10 +18,11 @@ A responsive music streaming web app built with React, TypeScript, Redux Toolkit
 - **Synced lyrics** from [LRCLIB](https://lrclib.net), with tap-to-seek (coverage is limited for independent Audius releases)
 - **Installable app (PWA)** that opens offline and caches artwork and recent pages
 - **Full-screen "Stage" player** on desktop: cover art on a spinning record, synced lyrics or up next in a side panel, controls that fade when idle
+- **Adjustable desktop layout**: drag the player and queue panel edges to resize them (double-click resets; arrow keys work too), hide the queue column, and expand the sidebar to show labels and your playlists; sizes are remembered
 - **Mobile layout**: bottom tabs, mini player, full-screen now-playing sheet, safe-area aware
 - **Lock-screen and headphone controls** through the Media Session API
 - **Light and dark themes** that follow the system setting
-- **Keyboard shortcuts**: `Space` play/pause, `Shift+←/→` previous/next, `M` mute, `F` full screen
+- **Keyboard shortcuts**: `Space` play/pause, `Shift+←/→` previous/next, `M` mute, `F` full screen, `[` expand/collapse sidebar
 
 ## Getting started
 

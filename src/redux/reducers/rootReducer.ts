@@ -7,6 +7,7 @@ import ArtistReducer from "./ArtistReducer";
 import LibraryReducer from "./LibraryReducer";
 import LyricsReducer from "./LyricsReducer";
 import UIReducer from "./UIReducer";
+import LayoutReducer from "./LayoutReducer";
 
 export const rootReducer = combineReducers({
   player: PlayerReducer,
@@ -17,5 +18,6 @@ export const rootReducer = combineReducers({
   library: LibraryReducer,
   lyrics: LyricsReducer,
   ui: UIReducer,
+  layout: LayoutReducer,
 })
 export type RootState = ReturnType<typeof rootReducer>

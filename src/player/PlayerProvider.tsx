@@ -5,6 +5,7 @@ import { playNext, previous, selectCurrentSong, setPlaying, togglePlaying } from
 import { loadSuggestions } from "../redux/reducers/CatalogReducer";
 import { showToast } from "../redux/reducers/UIReducer";
 import { enterFullscreen, exitFullscreen } from "./fullscreen";
+import { toggleSidebar } from "../redux/reducers/LayoutReducer";
 import { artistNames, decodeEntities, pickAudio } from "../utils/format";
 import { PlaybackContext, PlaybackContextValue } from "./playback";
 import { getYouTubePlayer, preloadYouTubePlayer, setYouTubeEvents, YT_STATE } from "./youtubePlayer";
@@ -295,7 +296,7 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
       : 'EchoWave';
   }, [song, isPlaying]);
 
-  // Space: play/pause, Shift+←/→: previous/next, M: mute, F: full screen.
+  // Space: play/pause, Shift+←/→: previous/next, M: mute, F: full screen, [: sidebar.
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
       if (isTypingTarget(event.target) || event.metaKey || event.ctrlKey || event.altKey) return;
@@ -308,6 +309,8 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
         prev();
       } else if (event.key === 'm' || event.key === 'M') {
         toggleMute();
+      } else if (event.key === '[' && window.matchMedia('(min-width: 900px)').matches) {
+        dispatch(toggleSidebar());
       } else if ((event.key === 'f' || event.key === 'F') && window.matchMedia('(min-width: 900px)').matches) {
         // Full screen is a desktop feature; phones already get a full-screen sheet.
         if (store.getState().ui.fullscreenOpen) exitFullscreen(dispatch);

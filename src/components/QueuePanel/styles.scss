@@ -20,8 +20,13 @@
     font-weight: 700;
   }
 
-  &__close {
+  &__close,
+  &__hide {
     @include icon-button(40px);
+  }
+
+  &__hide {
+    display: none;
   }
 
   &__label-row {
@@ -60,9 +65,24 @@
     color: $text-3;
   }
 
-  // Wide desktop: a permanent column, no close button.
+  // Wide desktop: a resizable column that can be hidden.
   @include wide {
+    position: relative;
+
     &__close {
+      display: none;
+    }
+    &__hide {
+      display: inline-flex;
+    }
+    .app--queue-hidden & {
+      display: none;
+    }
+  }
+
+  // The resize handle only makes sense for the column.
+  @media (max-width: #{$bp-wide - 1px}) {
+    .resize-handle {
       display: none;
     }
   }

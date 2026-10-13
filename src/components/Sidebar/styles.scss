@@ -5,7 +5,9 @@
   flex-direction: column;
   align-items: center;
   gap: 24px;
-  padding: 20px 0;
+  min-width: 0;
+  padding: 20px 0 12px;
+  overflow: hidden;
   background: $surface;
   border-right: 1px solid $border;
 
@@ -13,7 +15,23 @@
     display: none;
   }
 
+  &__brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+    color: $text;
+  }
+
+  &__brand-name {
+    display: none;
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+
   &__logo {
+    flex-shrink: 0;
     text-decoration: none;
     width: 44px;
     height: 44px;
@@ -63,12 +81,131 @@
     font-weight: 600;
   }
 
-  // The queue has its own column on wide screens.
+  // The queue has its own column on wide screens, unless it's hidden.
   @include wide {
     &__queue {
       display: none;
     }
+    .app--queue-hidden &__queue {
+      display: block;
+    }
   }
+}
+
+.sidebar__toggle {
+  @include icon-button(40px, $text-3);
+  & {
+    margin-top: auto;
+    flex-shrink: 0;
+    border-radius: $radius;
+  }
+}
+
+// ---- Expanded: labels beside icons, plus a list of playlists.
+.sidebar--expanded {
+  align-items: stretch;
+  padding-inline: 12px;
+  gap: 20px;
+
+  .sidebar__brand {
+    padding-inline: 4px;
+  }
+  .sidebar__brand-name {
+    display: inline;
+  }
+
+  .sidebar__item {
+    width: 100%;
+    flex-direction: row;
+    justify-content: flex-start;
+    gap: 14px;
+    padding: 10px 12px;
+    font-size: 16px;
+  }
+  .sidebar__label {
+    font-size: $font-sm;
+  }
+
+  .sidebar__toggle {
+    align-self: flex-end;
+  }
+}
+
+.sidebar__library {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  border-top: 1px solid $border;
+  padding-top: 16px;
+
+  ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    overflow-y: auto;
+  }
+}
+
+.sidebar__heading {
+  padding: 0 8px 8px;
+  font-size: $font-xs;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: $text-3;
+}
+
+.sidebar__playlist {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 8px;
+  border-radius: $radius-sm;
+  color: inherit;
+  text-decoration: none;
+  &:hover {
+    background: $surface-2;
+  }
+  &.is-active {
+    background: $surface-2;
+    .sidebar__playlist-name {
+      color: $accent-text;
+    }
+  }
+}
+
+.sidebar__playlist-cover {
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  font-size: 14px;
+
+  &--liked {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: $radius-sm;
+    color: #fff;
+    background: linear-gradient(135deg, #4f3bd6, #1ed760);
+  }
+}
+
+.sidebar__playlist-text {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar__playlist-name {
+  @include ellipsis;
+  font-size: $font-sm;
+  font-weight: 500;
+}
+
+.sidebar__playlist-meta {
+  font-size: $font-xs;
+  color: $text-3;
 }
 
 .bottom-nav {

@@ -3,6 +3,7 @@ import { Navigate, Route, Routes, useLocation } from "react-router-dom";
 import './App.scss';
 import { useAppDispatch, useAppSelector } from "./redux/store";
 import { closeOverlays } from "./redux/reducers/UIReducer";
+import { LAYOUT_LIMITS } from "./redux/reducers/LayoutReducer";
 import { loadDiscover } from "./redux/reducers/CatalogReducer";
 import { Sidebar, BottomNav } from "./components/Sidebar";
 import { NowPlaying } from "./components/NowPlaying";
@@ -26,6 +27,12 @@ function App() {
   const mainRef = useRef<HTMLElement>(null);
   const online = useOnlineStatus();
   const fullscreenOpen = useAppSelector((state) => state.ui.fullscreenOpen);
+  const layout = useAppSelector((state) => state.layout);
+  const layoutStyle = {
+    '--sidebar-w': `${layout.sidebarExpanded ? LAYOUT_LIMITS.sidebarExpanded : LAYOUT_LIMITS.sidebarCollapsed}px`,
+    '--player-w': `${layout.playerWidth}px`,
+    '--queue-w': `${layout.queueWidth}px`,
+  } as React.CSSProperties;
 
   // Load starter content on any entry page, so the player isn't empty
   // when the app is opened straight onto e.g. a playlist link.
@@ -41,7 +48,8 @@ function App() {
   }, [pathname, dispatch]);
 
   return (
-    <div className="app">
+    <div className={`app ${layout.queueHidden ? 'app--queue-hidden' : ''} ${layout.sidebarExpanded ? 'app--sidebar-expanded' : ''}`}
+         style={layoutStyle}>
       <Sidebar />
       <main className='app__main' ref={mainRef}>
         {!online && (

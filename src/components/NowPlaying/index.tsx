@@ -13,6 +13,9 @@ import { Artwork } from "../Artwork";
 import { useArtworkUrl } from "../../hooks/useArtworkUrl";
 import { Song } from "../../Services/interfaces";
 import { useVideoSlot } from "../../player/videoSlots";
+import { ResizeHandle } from "../ResizeHandle";
+import { LAYOUT_LIMITS, setPlayerWidth } from "../../redux/reducers/LayoutReducer";
+import { useAppStore } from "../../redux/store";
 
 const NowPlayingBackdrop = ({ song }: { song: Song }) => {
   const art = useArtworkUrl(song.image, 'large');
@@ -24,6 +27,24 @@ const NowPlayingBackdrop = ({ song }: { song: Song }) => {
 const VideoSlot = ({ compact = false }: { compact?: boolean }) => {
   const slotRef = useVideoSlot(2, 41);
   return <div className={`now-playing__video ${compact ? 'now-playing__video--compact' : ''}`} ref={slotRef} />;
+};
+
+// Drag handle on the panel's left edge (desktop).
+const PlayerResizeHandle = () => {
+  const dispatch = useAppDispatch();
+  const store = useAppStore();
+  const width = useAppSelector((state) => state.layout.playerWidth);
+  return (
+    <ResizeHandle label='Resize player panel' cssVar='--player-w' width={width}
+                  min={LAYOUT_LIMITS.player.min} max={LAYOUT_LIMITS.player.max} defaultWidth={LAYOUT_LIMITS.player.default}
+                  reservedWidth={() => {
+                    const { layout } = store.getState();
+                    const queueColumn = window.innerWidth >= 1280 && !layout.queueHidden ? layout.queueWidth : 0;
+                    const sidebar = layout.sidebarExpanded ? LAYOUT_LIMITS.sidebarExpanded : LAYOUT_LIMITS.sidebarCollapsed;
+                    return sidebar + queueColumn + LAYOUT_LIMITS.mainMin;
+                  }}
+                  onCommit={(value) => dispatch(setPlayerWidth(value))} />
+  );
 };
 
 export const NowPlaying = () => {
@@ -43,6 +64,7 @@ export const NowPlaying = () => {
   if (!song) {
     return (
       <aside className='now-playing now-playing--empty' aria-label='Now playing'>
+        <PlayerResizeHandle />
         <i className='fa-solid fa-music' aria-hidden='true' />
         <p>Pick a song to start listening</p>
       </aside>
@@ -55,6 +77,7 @@ export const NowPlaying = () => {
   return (
     <aside className={`now-playing ${isOpen ? 'now-playing--open' : ''}`} aria-label='Now playing'>
       <NowPlayingBackdrop song={song} />
+      <PlayerResizeHandle />
       <header className='now-playing__header'>
         <button className='now-playing__icon-button now-playing__close' onClick={() => dispatch(setNowPlayingOpen(false))}
                 aria-label='Close now playing'>

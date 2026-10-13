@@ -2,6 +2,9 @@ import React, { useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from "../../redux/store";
 import { clearUpcoming, jumpTo, moveInQueue, removeFromQueue } from "../../redux/reducers/PlayerReducer";
 import { setQueueOpen } from "../../redux/reducers/UIReducer";
+import { LAYOUT_LIMITS, setQueueHidden, setQueueWidth } from "../../redux/reducers/LayoutReducer";
+import { useAppStore } from "../../redux/store";
+import { ResizeHandle } from "../ResizeHandle";
 import { SongList } from "../SongList";
 import { StatusMessage } from "../Status";
 import './styles.scss';
@@ -10,6 +13,8 @@ export const QueuePanel = () => {
   const dispatch = useAppDispatch();
   const { queue, index } = useAppSelector((state) => state.player);
   const isOpen = useAppSelector((state) => state.ui.queueOpen);
+  const queueWidth = useAppSelector((state) => state.layout.queueWidth);
+  const store = useAppStore();
   const current = queue.slice(index, index + 1);
   const upcoming = queue.slice(index + 1);
 
@@ -25,8 +30,21 @@ export const QueuePanel = () => {
       <div className={`queue-scrim ${isOpen ? 'queue-scrim--open' : ''}`} onClick={() => dispatch(setQueueOpen(false))}
            aria-hidden='true' />
       <aside className={`queue ${isOpen ? 'queue--open' : ''}`} aria-label='Queue'>
+        {/* Only shown when the queue is a column (wide screens). */}
+        <ResizeHandle label='Resize queue panel' cssVar='--queue-w' width={queueWidth}
+                      min={LAYOUT_LIMITS.queue.min} max={LAYOUT_LIMITS.queue.max} defaultWidth={LAYOUT_LIMITS.queue.default}
+                      reservedWidth={() => {
+                        const { layout } = store.getState();
+                        const sidebar = layout.sidebarExpanded ? LAYOUT_LIMITS.sidebarExpanded : LAYOUT_LIMITS.sidebarCollapsed;
+                        return sidebar + layout.playerWidth + LAYOUT_LIMITS.mainMin;
+                      }}
+                      onCommit={(value) => dispatch(setQueueWidth(value))} />
         <header className='queue__header'>
           <h2 className='queue__title'>Queue</h2>
+          <button className='queue__hide' onClick={() => dispatch(setQueueHidden(true))}
+                  aria-label='Hide queue' title='Hide queue'>
+            <i className='fa-solid fa-right-from-bracket' />
+          </button>
           <button className='queue__close' onClick={() => dispatch(setQueueOpen(false))} aria-label='Close queue'>
             <i className='fa-solid fa-xmark' />
           </button>

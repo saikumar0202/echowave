@@ -14,6 +14,8 @@ const client = axios.create({ baseURL: 'https://www.googleapis.com/youtube/v3/',
 // The free quota is ~100 searches a day for the whole site, so results are
 // cached in the browser.
 const SEARCH_TTL_MS = 24 * 60 * 60 * 1000;
+// Bump when the shape or cleanup of cached songs changes.
+const CACHE_VERSION = 'v4';
 const PLAYLIST_TTL_MS = 6 * 60 * 60 * 1000;
 // Skip shorts, teasers and hour-long "jukebox" compilations.
 const MIN_SECONDS = 60;
@@ -78,33 +80,55 @@ const decodeHtml = (value: string) =>
 const titleCase = (value: string) =>
   value.toLowerCase().replace(/(^|[\s(-])(\p{L})/gu, (_, lead: string, letter: string) => lead + letter.toUpperCase());
 
-const NOISE = /\b(full\s+)?(video|lyric(al)?|audio)(\s+(song|video))?s?\b|\b(4k|8k|hd|full\s+song|video\s+song|song)\b/gi;
+// Words labels add around the song name: "8K VIDEO", "Lyrical", "(Song)", "Full Video Song"...
+const NOISE = /\b(full\s+)?(video|lyric(al)?|audio)(\s+(song|video))?s?\b|\b(4k|8k|hd|full\s+song|video\s+song)\b/gi;
+const BRACKETED_NOISE = /[([]\s*(official|lyrical|full|video|audio|telugu|hd|4k|8k|song)[^)\]]*[)\]]/gi;
 
-// Label uploads look like "YAALALO YAALALO Lyrical | Irumudi | Ravi Teja | GV Prakash"
-// or "Full Video: Yaalalo Yaalalo | Irumudi | ...". Returns the song name and,
-// when present, the film it's from.
-export const cleanVideoTitle = (raw: string): { name: string, movie: string | null } => {
-  const parts = decodeHtml(raw).split(/\s+[|｜]\s+/).map((part) => part.trim()).filter(Boolean);
-  // "SONG Video: Film" (T-Series style): the film comes after the colon.
-  // ("Full Video: Song" is the opposite order and handled below.)
-  const prefixed = /^(?:full\s+)?(?:video|lyrical|audio)\b/i.test(parts[0] ?? '');
-  const songVideoFilm = prefixed ? null
-    : /^(.+?)\s+(?:full\s+)?(?:video|lyrical|audio)(?:\s+song)?\s*:\s*(.+)$/i.exec(parts[0] ?? '');
-  if (songVideoFilm) parts.splice(0, 1, songVideoFilm[1], songVideoFilm[2]);
-  let name = (parts[0] ?? raw)
-    .replace(/^(full\s+)?(video|lyrical|audio)\s*(song)?\s*[:\-–]\s*/i, '')
-    .replace(/[([]\s*(official|lyrical|full|video|audio|telugu|hd|4k|8k)[^)\]]*[)\]]/gi, '')
-    .replace(/#\S+/g, '')
-    .replace(NOISE, '')
-    .replace(/\s{2,}/g, ' ')
-    .replace(/[\s:\-–|]+$/, '')
-    .trim();
-  if (!name) name = parts[0] ?? raw;
-  if (name === name.toUpperCase() && /\p{Lu}/u.test(name)) name = titleCase(name);
-  const movie = parts[1] && !/^(official|lyrical|video|telugu|ft\.?)/i.test(parts[1]) ? parts[1] : null;
-  return { name, movie };
+const stripNoise = (value: string) => value
+  .replace(BRACKETED_NOISE, '')
+  // Trailing hashtags are tags ("... #Irumudi #RaviTeja"); a leading one is
+  // usually the song itself ("#Vachinde Full Video Song").
+  .replace(/(\s+#\S+)+$/, '')
+  .replace(/#/g, '')
+  .replace(NOISE, '')
+  .replace(/\s{2,}/g, ' ')
+  .replace(/^[\s:\-–]+|[\s:\-–|]+$/g, '')
+  .trim();
+
+// "MALLEPOOLA PALLAKI (Film Version)" -> "Mallepoola Pallaki (Film Version)"
+const fixShouting = (value: string) => {
+  const outsideBrackets = value.replace(/[([][^)\]]*[)\]]/g, '');
+  if (!/\p{Lu}/u.test(outsideBrackets) || outsideBrackets !== outsideBrackets.toUpperCase()) return value;
+  return value.replace(/^[^([]+/, (caps) => titleCase(caps));
 };
 
+// Trailers, teasers and the like aren't songs.
+export const isNonSong = (title: string) =>
+  /\b(trailer|teaser|glimpse|promo|making|interview|review|reaction|ringtone|full\s+album|jukebox)\b/i.test(title);
+
+// Turns label uploads into a plain song name, e.g.
+//   "YAALALO YAALALO Lyrical | Irumudi | Ravi Teja"        -> "Yaalalo Yaalalo"
+//   "Full Video: Karthika Maasam | Ravi Teja | ..."           -> "Karthika Maasam"
+//   "IRUMUDI KATTU (Song): Ravi Teja | GV Prakash | ..."      -> "Irumudi Kattu"
+//   "Irumudi: Irumudi Bandho (Full Video) | Ravi Teja | ..."  -> "Irumudi Bandho"
+// The film can't be told apart from actor/composer credits reliably, so it
+// isn't guessed; the uploading label is shown instead.
+export const cleanVideoTitle = (raw: string): string => {
+  const first = decodeHtml(raw).split(/\s+[|｜]\s*|\s*[|｜]\s+/)[0]?.trim() ?? raw;
+  let name = first;
+  // Resolve "left: right" pairs. The song is on the right when the left is only
+  // a label ("Full Video:", "8K Video:") or when the right is marked as the
+  // song ("Film: Song (Full Video)"); otherwise it's on the left
+  // ("SONG Video: Film", "SONG (Song): Actor", "SONG : Film").
+  for (let guard = 0; guard < 3 && /\s*:\s*/.test(name); guard++) {
+    const [left, ...rest] = name.split(/\s*:\s*/);
+    const right = rest.join(': ');
+    const markedRight = /[([]\s*(full\s+)?(video|lyrical|audio|song)/i.test(right);
+    name = !stripNoise(left) || markedRight ? right : left;
+  }
+  const cleaned = stripNoise(name) || stripNoise(first) || decodeHtml(raw);
+  return fixShouting(cleaned);
+};
 const toImages = (thumbs: Thumbnails, videoId: string): URLFormat[] => {
   // medium is 16:9 with no letterbox bars, so it crops cleanly to a square.
   const medium = thumbs.medium?.url ?? `https://i.ytimg.com/vi/${videoId}/mqdefault.jpg`;
@@ -116,7 +140,7 @@ const toImages = (thumbs: Thumbnails, videoId: string): URLFormat[] => {
 };
 
 export const toYouTubeSong = (video: VideoSummary, durationSeconds: number): Song => {
-  const { name, movie } = cleanVideoTitle(video.title);
+  const name = cleanVideoTitle(video.title);
   const artist = {
     id: `yt-channel:${video.channelId}`,
     name: decodeHtml(video.channelTitle),
@@ -143,7 +167,7 @@ export const toYouTubeSong = (video: VideoSummary, durationSeconds: number): Son
     lyricsId: null,
     url: `https://www.youtube.com/watch?v=${video.videoId}`,
     copyright: '',
-    album: { id: '', name: movie ?? decodeHtml(video.channelTitle), url: '' },
+    album: { id: '', name: decodeHtml(video.channelTitle), url: '' },
     artists: { primary: [artist], featured: [], all: [artist] },
     image: toImages(video.thumbnails, video.videoId),
     downloadUrl: [],
@@ -194,12 +218,25 @@ const withDurations = async (videos: VideoSummary[]): Promise<Song[]> => {
     const detail = details.get(video.videoId);
     const seconds = detail ? parseIsoDuration(detail.contentDetails.duration) : 0;
     if (!detail || detail.status?.embeddable === false || seconds < MIN_SECONDS || seconds > MAX_SECONDS) return [];
+    if (isNonSong(video.title)) return [];
     return [toYouTubeSong(video, seconds)];
   });
 };
 
+// Labels upload the same song several times (lyrical, video, 8K...). Keep the
+// first (most relevant) per channel; other channels' versions, e.g. a dub, stay.
+export const dedupeVersions = (songs: Song[]): Song[] => {
+  const seen = new Set<string>();
+  return songs.filter((song) => {
+    const key = `${song.name.toLowerCase()}|${song.artists.primary[0]?.id}`;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+};
+
 export const searchYouTubeSongs = async (query: string, limit = 20): Promise<Song[]> => {
-  const cacheKey = `echowave:yt:search:${query.trim().toLowerCase()}`;
+  const cacheKey = `echowave:yt:${CACHE_VERSION}:search:${query.trim().toLowerCase()}`;
   const cached = readCache<Song[]>(cacheKey, SEARCH_TTL_MS);
   if (cached) return cached;
   const { items } = await call<{ items: SearchItem[] }>('search', {
@@ -221,13 +258,13 @@ export const searchYouTubeSongs = async (query: string, limit = 20): Promise<Son
     publishedAt: item.snippet.publishedAt,
     thumbnails: item.snippet.thumbnails,
   }));
-  const songs = (await withDurations(videos)).slice(0, limit);
+  const songs = dedupeVersions(await withDurations(videos)).slice(0, limit);
   writeCache(cacheKey, songs);
   return songs;
 };
 
 export const getYouTubePlaylist = async (playlistId = TELUGU_PLAYLIST_ID, limit = 40): Promise<Song[]> => {
-  const cacheKey = `echowave:yt:playlist:${playlistId}`;
+  const cacheKey = `echowave:yt:${CACHE_VERSION}:playlist:${playlistId}`;
   const cached = readCache<Song[]>(cacheKey, PLAYLIST_TTL_MS);
   if (cached) return cached.slice(0, limit);
   const { items } = await call<{ items: PlaylistItem[] }>('playlistItems', {

@@ -1,0 +1,47 @@
+@use "../../styles/tokens" as *;
+
+.resize-handle {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 6;
+  width: 10px;
+  cursor: col-resize;
+  touch-action: none;
+  outline: none;
+
+  // A thin line that appears on hover, focus and while dragging.
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 3px;
+    background: $accent;
+    opacity: 0;
+    transition: opacity 0.15s;
+  }
+
+  &:hover::after,
+  &:focus-visible::after,
+  .is-resizing &:active::after {
+    opacity: 1;
+  }
+
+  @include mobile {
+    display: none;
+  }
+}
+
+// While dragging: keep the col-resize cursor everywhere, stop text selection,
+// and stop iframes (the YouTube player) from swallowing pointer events.
+body.is-resizing {
+  cursor: col-resize;
+  user-select: none;
+
+  iframe {
+    pointer-events: none;
+  }
+}

@@ -99,9 +99,11 @@
     margin: 0 auto;
   }
 
+  // Grows with the panel (it can be resized), limited by window height so
+  // the controls stay on screen.
   &__art {
     width: 100%;
-    max-width: 340px;
+    max-width: min(100%, 52vh);
     margin: 0 auto;
     aspect-ratio: 1;
     border-radius: $radius;
@@ -121,7 +123,7 @@
   // cover art, or 16:9 above lyrics; never under YouTube's 200px minimum.
   &__video {
     width: 100%;
-    max-width: 340px;
+    max-width: min(100%, 52vh);
     margin: 0 auto;
     aspect-ratio: 1;
     min-height: 200px;
