@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { API_HOST } from "../../Services/api";
 import './styles.scss';
 
 interface MessageProps {
@@ -21,7 +20,7 @@ export const StatusMessage = ({ icon, title, children, action }: MessageProps) =
 export const ApiError = ({ onRetry }: { onRetry: () => void }) => (
   <StatusMessage icon='fa-solid fa-plug-circle-xmark' title="Couldn't reach the music service"
                  action={<button className='status-message__retry' onClick={onRetry}>Try again</button>}>
-    Make sure the API is running at <code>{API_HOST}</code>
+    Check your internet connection, or try again in a moment.
   </StatusMessage>
 );
 

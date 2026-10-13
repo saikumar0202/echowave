@@ -101,7 +101,7 @@ export const Search = () => {
             </Section>
           )}
           {albums.length > 0 && (
-            <Section title='Albums'>
+            <Section title='Albums & playlists'>
               <ul className='album-grid'>
                 {albums.map((album) => <AlbumCard key={album.id} album={album} />)}
               </ul>

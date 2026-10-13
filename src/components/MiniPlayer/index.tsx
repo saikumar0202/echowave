@@ -3,10 +3,11 @@ import { useAppDispatch, useAppSelector } from "../../redux/store";
 import { selectCurrentSong } from "../../redux/reducers/PlayerReducer";
 import { setNowPlayingOpen } from "../../redux/reducers/UIReducer";
 import { usePlayback } from "../../player/playback";
-import { artistNames, decodeEntities, pickImage } from "../../utils/format";
+import { artistNames, decodeEntities } from "../../utils/format";
 import { LikeButton } from "../LikeButton";
 import { ProgressBar } from "../PlayerControls";
 import './styles.scss';
+import { Artwork } from "../Artwork";
 
 // Phone-only bar above the bottom navigation; tapping it opens the
 // full-screen player.
@@ -25,7 +26,7 @@ export const MiniPlayer = () => {
       <div className='mini-player__body'>
         <button className='mini-player__open' onClick={() => dispatch(setNowPlayingOpen(true))}
                 aria-label={`Open player: ${name} by ${artists}`}>
-          <img src={pickImage(song.image, 'small')} alt='' width={40} height={40} />
+          <Artwork images={song.image} size='small' width={40} height={40} />
           <span className='mini-player__text'>
             <span className='mini-player__name'>{name}</span>
             <span className='mini-player__artists'>{artists}</span>

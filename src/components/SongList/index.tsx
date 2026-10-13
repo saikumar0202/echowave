@@ -10,11 +10,12 @@ import { CSS } from "@dnd-kit/utilities";
 import { Song } from "../../Services/interfaces";
 import { useAppDispatch, useAppSelector } from "../../redux/store";
 import { playSongs, selectCurrentSong, togglePlaying } from "../../redux/reducers/PlayerReducer";
-import { artistNames, decodeEntities, formatTime, pickImage } from "../../utils/format";
+import { artistNames, decodeEntities, formatTime } from "../../utils/format";
 import { LikeButton } from "../LikeButton";
 import { ArtistLinks } from "../ArtistCard";
 import { SongMenuButton } from "../SongMenu";
 import './styles.scss';
+import { Artwork } from "../Artwork";
 
 interface SongListProps {
   songs: Song[],
@@ -82,7 +83,7 @@ const SongRow = ({ song, index, variant, isActive, isPlaying, onPlay, onRemove, 
       )}
       <span className={`song-row__lead song-row__lead--${variant}`} aria-hidden='true'>
         {variant === 'art'
-          ? <img src={pickImage(song.image, 'small')} alt='' loading='lazy' width={44} height={44} />
+          ? <Artwork images={song.image} size='small' loading='lazy' width={44} height={44} />
           : <span className='song-row__number'>{index + 1}</span>}
         <span className='song-row__overlay'>
           {isActive && isPlaying

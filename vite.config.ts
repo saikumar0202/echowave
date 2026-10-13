@@ -35,8 +35,8 @@ export default defineConfig({
         // must not reference anything outside themselves.
         runtimeCaching: [
           {
-            // Cover art and artist photos.
-            urlPattern: ({ url }) => url.hostname.endsWith('saavncdn.com') && /\.(jpe?g|png|webp)$/i.test(url.pathname),
+            // Cover art and profile photos, served from many Audius content nodes.
+            urlPattern: ({ url }) => /\/content\/.+\/(150x150|480x480|1000x1000)\.jpg$/.test(url.pathname),
             handler: 'CacheFirst',
             options: {
               cacheName: 'artwork',
@@ -55,10 +55,10 @@ export default defineConfig({
             },
           },
           {
-            // Music data from a hosted API: fresh when online, last copy when
-            // offline. A local dev API is skipped; it's never "offline" on its own.
-            urlPattern: ({ url }) => !['localhost', '127.0.0.1', '[::1]'].includes(url.hostname)
-              && /\/api\/(search|songs|albums|artists)/.test(url.pathname),
+            // Music data: fresh when online, last copy when offline.
+            // Audio streams (/stream) are excluded.
+            urlPattern: ({ url }) => url.hostname === 'api.audius.co'
+              && /^\/v1\/(tracks|users|playlists)\//.test(url.pathname) && !url.pathname.endsWith('/stream'),
             handler: 'NetworkFirst',
             options: {
               cacheName: 'music-api',

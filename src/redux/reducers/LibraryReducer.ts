@@ -1,8 +1,9 @@
 import { createSlice, nanoid, PayloadAction } from "@reduxjs/toolkit";
 import { Song } from "../../Services/interfaces";
 
-export const LIKED_STORAGE_KEY = 'echowave:liked';
-export const PLAYLISTS_STORAGE_KEY = 'echowave:playlists';
+// Namespaced by music provider: saved songs carry provider-specific IDs.
+export const LIKED_STORAGE_KEY = 'echowave:audius:liked';
+export const PLAYLISTS_STORAGE_KEY = 'echowave:audius:playlists';
 
 export interface Playlist {
   id: string,

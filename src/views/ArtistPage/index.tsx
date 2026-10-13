@@ -9,8 +9,9 @@ import { AlbumCard } from "../../components/AlbumCard";
 import { ArtistCard } from "../../components/ArtistCard";
 import { PlayAllButton, Section } from "../../components/Section";
 import { ApiError, SongListSkeleton } from "../../components/Status";
-import { compactNumber, decodeEntities, pickImage } from "../../utils/format";
+import { compactNumber, decodeEntities } from "../../utils/format";
 import "../views.scss";
+import { Artwork } from "../../components/Artwork";
 
 const TOP_SONGS_PREVIEW = 5;
 
@@ -50,7 +51,7 @@ export const ArtistPage = () => {
       {status === 'ready' && artist && (
         <>
           <header className='collection-hero'>
-            <img className='collection-hero__art collection-hero__art--round' src={pickImage(artist.image, 'large')} alt='' />
+            <Artwork className='collection-hero__art collection-hero__art--round' images={artist.image} size='large' />
             <div className='collection-hero__text'>
               <p className='view__eyebrow'>
                 {artist.isVerified && <><i className='fa-solid fa-circle-check verified' aria-hidden='true' /> Verified </>}

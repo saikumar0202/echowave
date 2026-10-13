@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { Album, Song } from "../../Services/interfaces";
-import { searchSongs, getSongSuggestions } from "../../Services/songs";
-import { searchAlbums } from "../../Services/album";
+import { getSongSuggestions, getTrendingSongs } from "../../Services/songs";
+import { getTopAlbums } from "../../Services/album";
 import { setQueue } from "./PlayerReducer";
 import type { RootState } from "../store";
 
@@ -25,13 +25,12 @@ const initialState: CatalogState = {
   suggestionsStatus: 'idle',
 };
 
-// The API has no "charts" endpoint; an empty-ish query returns popular items.
 export const loadDiscover = createAsyncThunk<{ trending: Song[], topAlbums: Album[] }, void, { state: RootState }>(
   'catalog/loadDiscover',
   async (_, { dispatch, getState }) => {
     const [trending, topAlbums] = await Promise.all([
-      searchSongs(' ', 30),
-      searchAlbums(' ', 12),
+      getTrendingSongs(30),
+      getTopAlbums(12),
     ]);
     // Give the player something to show before the user picks a song.
     if (getState().player.queue.length === 0 && trending.length) {
@@ -42,10 +41,10 @@ export const loadDiscover = createAsyncThunk<{ trending: Song[], topAlbums: Albu
   { condition: (_, { getState }) => !['loading', 'ready'].includes(getState().catalog.status) },
 );
 
-export const loadSuggestions = createAsyncThunk<Song[], string, { state: RootState }>(
+export const loadSuggestions = createAsyncThunk<Song[], Song, { state: RootState }>(
   'catalog/loadSuggestions',
-  (songId) => getSongSuggestions(songId, 10),
-  { condition: (songId, { getState }) => getState().catalog.suggestionsFor !== songId },
+  (song) => getSongSuggestions(song, 10),
+  { condition: (song, { getState }) => getState().catalog.suggestionsFor !== song.id },
 );
 
 const catalogSlice = createSlice({
@@ -66,16 +65,16 @@ const catalogSlice = createSlice({
         state.status = 'error';
       })
       .addCase(loadSuggestions.pending, (state, action) => {
-        state.suggestionsFor = action.meta.arg;
+        state.suggestionsFor = action.meta.arg.id;
         state.suggestionsStatus = 'loading';
       })
       .addCase(loadSuggestions.fulfilled, (state, action) => {
-        if (state.suggestionsFor !== action.meta.arg) return;
+        if (state.suggestionsFor !== action.meta.arg.id) return;
         state.suggestions = action.payload;
         state.suggestionsStatus = 'ready';
       })
       .addCase(loadSuggestions.rejected, (state, action) => {
-        if (state.suggestionsFor !== action.meta.arg) return;
+        if (state.suggestionsFor !== action.meta.arg.id) return;
         state.suggestionsStatus = 'error';
         // Allow a retry the next time this song comes up.
         state.suggestionsFor = null;

@@ -8,8 +8,9 @@ import { SongList } from "../../components/SongList";
 import { PlayAllButton } from "../../components/Section";
 import { ApiError, SongListSkeleton } from "../../components/Status";
 import { ArtistLinks } from "../../components/ArtistCard";
-import { decodeEntities, formatTime, pickImage } from "../../utils/format";
+import { decodeEntities, formatTime } from "../../utils/format";
 import "../views.scss";
+import { Artwork } from "../../components/Artwork";
 
 export const AlbumPage = () => {
   const { id = '' } = useParams();
@@ -44,9 +45,9 @@ export const AlbumPage = () => {
       {status === 'ready' && album && (
         <>
           <header className='collection-hero'>
-            <img className='collection-hero__art' src={pickImage(album.image, 'large')} alt='' />
+            <Artwork className='collection-hero__art' images={album.image} size='large' />
             <div className='collection-hero__text'>
-              <p className='view__eyebrow'>{album.type === 'album' ? 'Album' : album.type}</p>
+              <p className='view__eyebrow'>{album.type === 'album' ? 'Album' : 'Playlist'}</p>
               <h1 className='view__title'>{decodeEntities(album.name)}</h1>
               <p className='collection-hero__meta'>
                 <ArtistLinks artists={album.artists} />

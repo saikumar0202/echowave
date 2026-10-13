@@ -6,6 +6,8 @@ export interface Name {
 export interface URLFormat {
   quality: string,
   url: string,
+  // Other servers that host the same file (Audius content nodes).
+  mirrors?: string[],
 }
 
 export interface ArtistBase extends Name {
@@ -72,6 +74,8 @@ export interface Song extends Name {
   lyricsId: null,
   url: string,
   copyright: string,
+  // Used to find similar songs.
+  genre?: string,
   album: {
     id: string,
     name: string,

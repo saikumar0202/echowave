@@ -37,8 +37,8 @@ jobs:
           npm run lint
           npm test
 
-      # Set the API URL under Settings → Secrets and variables → Actions →
-      # Variables as VITE_API_HOST (e.g. https://your-api.example.com/api/).
+      # Optional: set VITE_API_HOST (Settings → Secrets and variables →
+      # Actions → Variables) to pin an Audius discovery node.
       - name: Build the React app
         run: npm run build
         env:

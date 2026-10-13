@@ -7,9 +7,10 @@ import { addToQueue, insertNext } from "../../redux/reducers/PlayerReducer";
 import { addToPlaylist, createPlaylist } from "../../redux/reducers/LibraryReducer";
 import { showToast } from "../../redux/reducers/UIReducer";
 import { routes } from "../../routes";
-import { artistNames, decodeEntities, pickImage } from "../../utils/format";
+import { artistNames, decodeEntities } from "../../utils/format";
 import { MenuExtra, OpenMenu, SongMenuContext, useSongMenu } from "./context";
 import './styles.scss';
+import { Artwork } from "../Artwork";
 
 interface MenuState extends MenuExtra {
   song: Song,
@@ -108,7 +109,7 @@ const SongMenu = ({ state, onClose }: { state: MenuState, onClose: () => void })
       <div className='song-menu-scrim' onClick={onClose} aria-hidden='true' />
       <div className='song-menu' role='menu' aria-label={`Options for ${name}`} ref={menuRef} style={position}>
         <div className='song-menu__song'>
-          <img src={pickImage(song.image, 'small')} alt='' width={40} height={40} />
+          <Artwork images={song.image} size='small' width={40} height={40} />
           <span className='song-menu__song-text'>
             <span className='song-menu__song-name'>{name}</span>
             <span className='song-menu__song-artists'>{artistNames(song.artists)}</span>

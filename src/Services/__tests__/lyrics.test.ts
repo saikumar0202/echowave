@@ -1,4 +1,4 @@
-import { activeLineIndex, cleanTitle, parseLrc } from "../lyrics";
+import { activeLineIndex, cleanTitle, parseLrc, splitArtistTitle } from "../lyrics";
 
 describe('lyrics helpers', () => {
   it('strips soundtrack and version suffixes from titles', () => {
@@ -6,6 +6,11 @@ describe('lyrics helpers', () => {
     expect(cleanTitle('Mann Mera (Original Version)')).toBe('Mann Mera');
     expect(cleanTitle('Pehle Bhi Main - Lofi Mix')).toBe('Pehle Bhi Main');
     expect(cleanTitle('Tum Hi Ho')).toBe('Tum Hi Ho');
+  });
+
+  it('splits "Artist - Title" uploads', () => {
+    expect(splitArtistTitle('Rowsfred - CLAWN (Original Mix) [Eclipse Records]')).toEqual({ artist: 'Rowsfred', title: 'CLAWN' });
+    expect(splitArtistTitle('Midnight Drive')).toEqual({ artist: null, title: 'Midnight Drive' });
   });
 
   it('parses LRC lines and skips metadata', () => {

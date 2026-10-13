@@ -1,6 +1,6 @@
 # EchoWave
 
-A responsive music streaming web app built with React, TypeScript, Redux Toolkit, React Router and SCSS, bundled with Vite. Music data comes from the open-source [JioSaavn API](https://github.com/sumitkolhe/jiosaavn-api).
+A responsive music streaming web app built with React, TypeScript, Redux Toolkit, React Router and SCSS, bundled with Vite. Music comes from [Audius](https://audius.org), an open music platform whose public API streams full tracks uploaded by the artists themselves. No API key or backend is needed.
 
 ## Features
 
@@ -8,10 +8,11 @@ A responsive music streaming web app built with React, TypeScript, Redux Toolkit
 - **Search** songs, albums and artists as you type; searches have shareable URLs
 - **Album and artist pages**, with links from every song
 - **Library**: liked songs and playlists (create, rename, reorder, delete), saved in the browser
+- **Resilient artwork**: Audius serves images from many content nodes; slow or failing ones fall back to mirrors
 - **Song menu**: play next, add to queue, add to playlist, go to album or artist
 - **Queue**: drag to reorder (mouse, touch or keyboard), remove, clear, jump to a song
 - **Player**: shuffle, repeat (off / all / one), seek, volume, and auto-play of similar songs when the queue ends
-- **Synced lyrics** from [LRCLIB](https://lrclib.net), with tap-to-seek
+- **Synced lyrics** from [LRCLIB](https://lrclib.net), with tap-to-seek (coverage is limited for independent Audius releases)
 - **Installable app (PWA)** that opens offline and caches artwork and recent pages
 - **Full-screen "Stage" player** on desktop: cover art on a spinning record, synced lyrics or up next in a side panel, controls that fade when idle
 - **Mobile layout**: bottom tabs, mini player, full-screen now-playing sheet, safe-area aware
@@ -21,28 +22,12 @@ A responsive music streaming web app built with React, TypeScript, Redux Toolkit
 
 ## Getting started
 
-EchoWave needs the JioSaavn API running locally (the old public `saavn.dev` host no longer exists).
-
 ```bash
-# 1. Run the API on port 3001 (needs Bun: https://bun.sh)
-git clone https://github.com/sumitkolhe/jiosaavn-api.git
-cd jiosaavn-api
-bun install
-PORT=3001 bun run dev
-
-# 2. In another terminal, run the app
-cd echowave
 npm install
 npm start
 ```
 
-Open http://localhost:3000.
-
-To use a different API host, set `VITE_API_HOST`:
-
-```bash
-VITE_API_HOST=https://your-api.example.com/api/ npm start
-```
+Open http://localhost:3000. The app talks to `https://api.audius.co/v1/` directly from the browser; set `VITE_API_HOST` to use a different Audius discovery node.
 
 ## Scripts
 
@@ -59,7 +44,7 @@ VITE_API_HOST=https://your-api.example.com/api/ npm start
 
 ```
 src/
-  Services/      API client and endpoint wrappers
+  Services/      Audius client, adapters into the app's models (audius.ts), lyrics
   redux/         Store and slices: player (queue), catalog, search, album, artist,
                  library (liked + playlists), lyrics, ui
   player/        PlayerProvider: owns the <audio> element, media session, shortcuts
@@ -72,6 +57,4 @@ src/
 ## Deployment
 
 - `.github/workflows/ci.yml` runs lint, tests and a production build on every pull request.
-- `.github/workflows/deploy.yml` runs the same checks, then builds and publishes to GitHub Pages on every push to `main`.
-
-The deployed site can't reach `localhost`, so host the API somewhere public (it deploys to Vercel or Cloudflare Workers), then add its URL as a repository variable named `VITE_API_HOST` (Settings → Secrets and variables → Actions → Variables), for example `https://your-api.example.com/api/`.
+- `.github/workflows/deploy.yml` runs the same checks, then builds and publishes to GitHub Pages on every push to `main`. No backend or secrets are required.

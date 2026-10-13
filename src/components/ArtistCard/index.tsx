@@ -2,17 +2,17 @@ import * as React from 'react';
 import { Link } from "react-router-dom";
 import { ArtistBase, Artists } from "../../Services/interfaces";
 import { routes } from "../../routes";
-import { decodeEntities, pickImage } from "../../utils/format";
+import { decodeEntities } from "../../utils/format";
 import './styles.scss';
+import { Artwork } from "../Artwork";
 
 export const ArtistCard = ({ artist }: { artist: ArtistBase }) => {
   const name = decodeEntities(artist.name);
-  const image = pickImage(artist.image, 'medium');
   return (
     <li className='artist-card'>
       <Link className='artist-card__link' to={routes.artist(artist.id)} aria-label={`Artist ${name}`}>
         <span className='artist-card__image'>
-          {image ? <img src={image} alt='' loading='lazy' /> : <i className='fa-solid fa-user' aria-hidden='true' />}
+          {artist.image?.length ? <Artwork images={artist.image} size='medium' loading='lazy' /> : <i className='fa-solid fa-user' aria-hidden='true' />}
         </span>
         <span className='artist-card__name' title={name}>{name}</span>
         <span className='artist-card__type'>Artist</span>

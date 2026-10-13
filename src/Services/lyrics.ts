@@ -77,9 +77,16 @@ const getExact = async (title: string, artist: string, duration: number): Promis
   }
 };
 
+// Uploads are often titled "Artist - Title"; split that into its parts.
+export const splitArtistTitle = (name: string): { artist: string | null, title: string } => {
+  const decoded = decodeEntities(name);
+  const match = /^(.+?)\s+[-–—]\s+(.+)$/.exec(decoded);
+  return match ? { artist: match[1].trim(), title: cleanTitle(match[2]) } : { artist: null, title: cleanTitle(decoded) };
+};
+
 export const getLyrics = async (song: Song): Promise<Lyrics | null> => {
-  const title = cleanTitle(song.name);
-  const artists = songArtists(song);
+  const { artist: titleArtist, title } = splitArtistTitle(song.name);
+  const artists = Array.from(new Set([...(titleArtist ? [titleArtist] : []), ...songArtists(song)]));
 
   // Exact lookups first (cheap and accurate); songs are often filed under
   // the second credited artist, so try a couple.

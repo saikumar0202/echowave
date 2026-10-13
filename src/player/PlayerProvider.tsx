@@ -50,7 +50,7 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
     audio.src = src;
     setCurrentTime(0);
     setDuration(song.duration || 0);
-    dispatch(loadSuggestions(song.id));
+    dispatch(loadSuggestions(song));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [song?.id, dispatch]);
 

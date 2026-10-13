@@ -1,14 +1,17 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useAppDispatch, useAppSelector } from "../../redux/store";
 import { jumpTo, selectCurrentSong } from "../../redux/reducers/PlayerReducer";
+import { loadLyrics } from "../../redux/reducers/LyricsReducer";
 import { exitFullscreen } from "../../player/fullscreen";
-import { decodeEntities, pickImage } from "../../utils/format";
+import { decodeEntities } from "../../utils/format";
 import { ArtistLinks } from "../ArtistCard";
 import { LikeButton } from "../LikeButton";
 import { LyricsPanel } from "../Lyrics";
 import { SongList } from "../SongList";
 import { ProgressBar, TransportControls, VolumeControl } from "../PlayerControls";
 import './styles.scss';
+import { Artwork } from "../Artwork";
+import { useArtworkUrl } from "../../hooks/useArtworkUrl";
 
 // Hide secondary chrome and the cursor after this long without input.
 const IDLE_MS = 3000;
@@ -20,10 +23,19 @@ export const FullscreenPlayer = () => {
   const dispatch = useAppDispatch();
   const song = useAppSelector(selectCurrentSong);
   const { queue, index, isPlaying } = useAppSelector((state) => state.player);
-  const [panel, setPanel] = useState<Panel>('lyrics');
+  const lyrics = useAppSelector((state) => state.lyrics);
+  // null = automatic: lyrics when the song has them, otherwise up next.
+  const [chosenPanel, setPanel] = useState<Panel | null>(null);
   const [idle, setIdle] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
   const upcoming = queue.slice(index + 1, index + 1 + UP_NEXT_LIMIT);
+  const backdrop = useArtworkUrl(song?.image, 'large');
+  const hasLyrics = lyrics.songId === song?.id && Boolean(lyrics.lyrics?.synced?.length || lyrics.lyrics?.plain);
+  const panel: Panel = chosenPanel ?? (hasLyrics ? 'lyrics' : 'queue');
+
+  useEffect(() => {
+    if (song) dispatch(loadLyrics(song));
+  }, [song, dispatch]);
 
   // Leaving browser full screen (Esc, F11, system gesture) closes the view too.
   useEffect(() => {
@@ -67,13 +79,12 @@ export const FullscreenPlayer = () => {
 
   if (!song) return null;
   const name = decodeEntities(song.name);
-  const art = pickImage(song.image, 'large');
   const nextSong = queue[index + 1];
 
   return (
     <div className={`stage ${idle ? 'is-idle' : ''} ${isPlaying ? 'is-playing' : ''}`} ref={rootRef} tabIndex={-1}
          role='dialog' aria-modal='true' aria-label={`Full screen player: ${name}`}>
-      <div className='stage__backdrop' style={{ backgroundImage: `url(${art})` }} aria-hidden='true' />
+      <div className='stage__backdrop' style={{ backgroundImage: `url(${backdrop})` }} aria-hidden='true' />
 
       <header className='stage__header'>
         <span className='stage__brand'><i className='fa-solid fa-wave-square' aria-hidden='true' /> EchoWave</span>
@@ -96,9 +107,9 @@ export const FullscreenPlayer = () => {
         <section className='stage__now'>
           <div className='stage__record-wrap'>
             <div className='stage__record' aria-hidden='true'>
-              <img className='stage__label' src={pickImage(song.image, 'small')} alt='' />
+              <Artwork className='stage__label' images={song.image} size='small' />
             </div>
-            <img className='stage__cover' src={art} alt={`${name} cover art`} />
+            <Artwork className='stage__cover' images={song.image} size='large' alt={`${name} cover art`} />
           </div>
           <div className='stage__meta'>
             <div className='stage__titles'>
