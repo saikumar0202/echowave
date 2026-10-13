@@ -5,6 +5,7 @@ import SearchReducer from "./SearchReducer";
 import AlbumReducer from "./AlbumReducer";
 import ArtistReducer from "./ArtistReducer";
 import LibraryReducer from "./LibraryReducer";
+import LyricsReducer from "./LyricsReducer";
 import UIReducer from "./UIReducer";
 
 export const rootReducer = combineReducers({
@@ -14,6 +15,7 @@ export const rootReducer = combineReducers({
   album: AlbumReducer,
   artist: ArtistReducer,
   library: LibraryReducer,
+  lyrics: LyricsReducer,
   ui: UIReducer,
 })
 export type RootState = ReturnType<typeof rootReducer>

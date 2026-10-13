@@ -1,11 +1,12 @@
 import React, { useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from "../../redux/store";
 import { cycleRepeat, selectCurrentSong, toggleShuffle } from "../../redux/reducers/PlayerReducer";
-import { setNowPlayingOpen, setQueueOpen } from "../../redux/reducers/UIReducer";
+import { setNowPlayingOpen, setQueueOpen, toggleLyrics } from "../../redux/reducers/UIReducer";
 import { usePlayback } from "../../player/PlayerProvider";
 import { artistNames, decodeEntities, formatTime, pickImage } from "../../utils/format";
 import { LikeButton } from "../LikeButton";
 import { ArtistLinks } from "../ArtistCard";
+import { LyricsPanel } from "../Lyrics";
 import './styles.scss';
 
 const REPEAT_LABELS = { off: 'Repeat off', all: 'Repeat all', one: 'Repeat one' };
@@ -39,6 +40,7 @@ export const NowPlaying = () => {
   const song = useAppSelector(selectCurrentSong);
   const { isPlaying, shuffle, repeat } = useAppSelector((state) => state.player);
   const isOpen = useAppSelector((state) => state.ui.nowPlayingOpen);
+  const lyricsOpen = useAppSelector((state) => state.ui.lyricsOpen);
   const { toggle, next, prev, volume, muted, setVolume, toggleMute } = usePlayback();
 
   // Close the phone sheet with Escape / the hardware back gesture feel.
@@ -75,15 +77,21 @@ export const NowPlaying = () => {
           <span className='now-playing__eyebrow'>Now playing</span>
           <span className='now-playing__album' title={decodeEntities(song.album?.name)}>{decodeEntities(song.album?.name)}</span>
         </div>
+        <button className={`now-playing__icon-button ${lyricsOpen ? 'is-active' : ''}`} onClick={() => dispatch(toggleLyrics())}
+                aria-pressed={lyricsOpen} aria-label='Lyrics' title='Lyrics'>
+          <i className='fa-solid fa-microphone-lines' />
+        </button>
         <button className='now-playing__icon-button now-playing__queue-toggle' onClick={() => dispatch(setQueueOpen(true))}
                 aria-label='Show queue' title='Queue'>
           <i className='fa-solid fa-list-ul' />
         </button>
       </header>
 
-      <div className='now-playing__art'>
-        <img src={art} alt={`${name} cover art`} />
-      </div>
+      {lyricsOpen ? <LyricsPanel song={song} /> : (
+        <div className='now-playing__art'>
+          <img src={art} alt={`${name} cover art`} />
+        </div>
+      )}
 
       <div className='now-playing__info'>
         <div className='now-playing__titles'>
