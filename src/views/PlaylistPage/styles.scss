@@ -1,0 +1,70 @@
+@use "../../styles/tokens" as *;
+
+.playlist-title {
+  @include reset-button;
+  & {
+    max-width: 100%;
+    text-align: inherit;
+    overflow-wrap: anywhere;
+  }
+
+  i {
+    font-size: 16px;
+    color: $text-3;
+    vertical-align: middle;
+    opacity: 0;
+    transition: opacity 0.15s;
+  }
+
+  &:hover i,
+  &:focus-visible i {
+    opacity: 1;
+  }
+
+  @media (hover: none) {
+    i {
+      opacity: 1;
+    }
+  }
+}
+
+.playlist-rename {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+  max-width: 480px;
+
+  input {
+    flex: 1;
+    min-width: 0;
+    height: 44px;
+    padding: 0 14px;
+    border-radius: $radius-sm;
+    border: 1px solid $accent;
+    background: $surface;
+    color: $text;
+    font: inherit;
+    font-size: $font-lg;
+    font-weight: 700;
+    outline: none;
+  }
+}
+
+.playlist-confirm {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  font-size: $font-sm;
+
+  &__yes {
+    @include reset-button;
+    & {
+      padding: 6px 14px;
+      border-radius: 999px;
+      background: #e5484d;
+      color: #fff;
+      font-weight: 600;
+    }
+  }
+}

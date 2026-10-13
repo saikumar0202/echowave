@@ -1,5 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { Song } from "../../Services/interfaces";
+import { moveItem } from "./LibraryReducer";
 import type { AppThunk, RootState } from "../store";
 
 export type RepeatMode = 'off' | 'all' | 'one';
@@ -58,6 +59,22 @@ const playerSlice = createSlice({
       state.queue.push(action.payload);
       state.originalQueue?.push(action.payload);
     },
+    // "Play next": right after the current song.
+    insertNext: (state, action: PayloadAction<Song>) => {
+      if (state.queue.length === 0) {
+        state.queue = [action.payload];
+        state.index = 0;
+        return;
+      }
+      state.queue.splice(state.index + 1, 0, action.payload);
+      state.originalQueue?.push(action.payload);
+    },
+    // Reorders upcoming songs; `from`/`to` are queue indices after the current song.
+    moveInQueue: (state, action: PayloadAction<{ from: number, to: number }>) => {
+      const { from, to } = action.payload;
+      if (from <= state.index || to <= state.index) return;
+      moveItem(state.queue, from, to);
+    },
     removeFromQueue: (state, action: PayloadAction<number>) => {
       const removeAt = action.payload;
       if (removeAt === state.index || removeAt < 0 || removeAt >= state.queue.length) return;
@@ -109,7 +126,7 @@ const playerSlice = createSlice({
 });
 
 export const {
-  setQueue, appendToQueue, addToQueue, removeFromQueue, clearUpcoming, jumpTo,
+  setQueue, appendToQueue, addToQueue, insertNext, moveInQueue, removeFromQueue, clearUpcoming, jumpTo,
   next, previous, setPlaying, togglePlaying, cycleRepeat,
 } = playerSlice.actions;
 

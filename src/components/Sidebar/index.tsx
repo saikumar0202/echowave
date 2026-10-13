@@ -1,24 +1,31 @@
 import * as React from 'react';
-import { NavLink } from "react-router-dom";
+import { NavLink, useLocation } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../redux/store";
 import { setQueueOpen } from "../../redux/reducers/UIReducer";
 import { routes } from "../../routes";
 import './styles.scss';
 
-export const NAV_ITEMS: { to: string, label: string, icon: string, end?: boolean }[] = [
+// `also` lists other paths that belong to the same tab.
+export const NAV_ITEMS: { to: string, label: string, icon: string, end?: boolean, also?: string[] }[] = [
   { to: routes.discover(), label: 'Discover', icon: 'fa-solid fa-compass', end: true },
   { to: routes.search(), label: 'Search', icon: 'fa-solid fa-magnifying-glass' },
-  { to: routes.liked(), label: 'Liked', icon: 'fa-solid fa-heart' },
+  { to: routes.library(), label: 'Library', icon: 'fa-solid fa-book-bookmark', also: ['/liked', '/playlist/'] },
 ];
 
-const useQueueToggle = () => {
+const useNav = () => {
   const dispatch = useAppDispatch();
+  const { pathname } = useLocation();
   const queueOpen = useAppSelector((state) => state.ui.queueOpen);
-  return { queueOpen, toggleQueue: () => dispatch(setQueueOpen(!queueOpen)) };
+  return {
+    queueOpen,
+    toggleQueue: () => dispatch(setQueueOpen(!queueOpen)),
+    isActive: (item: typeof NAV_ITEMS[number], routerActive: boolean) =>
+      routerActive || Boolean(item.also?.some((path) => pathname.startsWith(path))),
+  };
 };
 
 export const Sidebar = () => {
-  const { queueOpen, toggleQueue } = useQueueToggle();
+  const { queueOpen, toggleQueue, isActive: matches } = useNav();
   return (
     <nav className='sidebar' aria-label='Main'>
       <NavLink to={routes.discover()} className='sidebar__logo' aria-label='EchoWave home'>
@@ -28,7 +35,7 @@ export const Sidebar = () => {
         {NAV_ITEMS.map((item) => (
           <li key={item.to}>
             <NavLink to={item.to} end={item.end} aria-label={item.label}
-                     className={({ isActive }) => `sidebar__item ${isActive ? 'is-active' : ''}`}>
+                     className={({ isActive }) => `sidebar__item ${matches(item, isActive) ? 'is-active' : ''}`}>
               <i className={item.icon} aria-hidden='true' />
               <span className='sidebar__label'>{item.label}</span>
             </NavLink>
@@ -47,16 +54,14 @@ export const Sidebar = () => {
 };
 
 export const BottomNav = () => {
-  const { queueOpen, toggleQueue } = useQueueToggle();
-  const likedCount = useAppSelector((state) => state.library.liked.length);
+  const { queueOpen, toggleQueue, isActive: matches } = useNav();
   return (
     <nav className='bottom-nav' aria-label='Main'>
       {NAV_ITEMS.map((item) => (
         <NavLink key={item.to} to={item.to} end={item.end}
-                 className={({ isActive }) => `bottom-nav__item ${isActive && !queueOpen ? 'is-active' : ''}`}>
+                 className={({ isActive }) => `bottom-nav__item ${matches(item, isActive) && !queueOpen ? 'is-active' : ''}`}>
           <span className='bottom-nav__icon'>
             <i className={item.icon} aria-hidden='true' />
-            {item.to === routes.liked() && likedCount > 0 && <span className='bottom-nav__badge'>{likedCount}</span>}
           </span>
           <span>{item.label}</span>
         </NavLink>

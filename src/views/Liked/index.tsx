@@ -1,6 +1,8 @@
 import React from "react";
 import { useAppDispatch, useAppSelector } from "../../redux/store";
 import { playSongs } from "../../redux/reducers/PlayerReducer";
+import { toggleLike } from "../../redux/reducers/LibraryReducer";
+import { BackButton } from "../../components/BackButton";
 import { SongList } from "../../components/SongList";
 import { PlayAllButton } from "../../components/Section";
 import { StatusMessage } from "../../components/Status";
@@ -12,6 +14,7 @@ export const Liked = () => {
 
   return (
     <div className='view'>
+      <BackButton />
       <header className='collection-hero'>
         <div className='collection-hero__art collection-hero__art--liked' aria-hidden='true'>
           <i className='fa-solid fa-heart' />
@@ -32,7 +35,7 @@ export const Liked = () => {
           Tap the heart on any song to save it.
         </StatusMessage>
       ) : (
-        <SongList songs={liked} />
+        <SongList songs={liked} onRemove={(index) => dispatch(toggleLike(liked[index]))} removeLabel='Remove from Liked' />
       )}
     </div>
   );

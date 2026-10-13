@@ -39,7 +39,7 @@ export const loadDiscover = createAsyncThunk<{ trending: Song[], topAlbums: Albu
     }
     return { trending, topAlbums };
   },
-  { condition: (_, { getState }) => getState().catalog.status !== 'loading' },
+  { condition: (_, { getState }) => !['loading', 'ready'].includes(getState().catalog.status) },
 );
 
 export const loadSuggestions = createAsyncThunk<Song[], string, { state: RootState }>(

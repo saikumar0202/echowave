@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from "../../redux/store";
-import { clearUpcoming, jumpTo, removeFromQueue } from "../../redux/reducers/PlayerReducer";
+import { clearUpcoming, jumpTo, moveInQueue, removeFromQueue } from "../../redux/reducers/PlayerReducer";
 import { setQueueOpen } from "../../redux/reducers/UIReducer";
 import { SongList } from "../SongList";
 import { StatusMessage } from "../Status";
@@ -33,7 +33,7 @@ export const QueuePanel = () => {
         </header>
         {queue.length === 0 ? (
           <StatusMessage icon='fa-solid fa-list-ul' title='Your queue is empty'>
-            Play a song or add one with the <i className='fa-solid fa-list' aria-label='add to queue' /> button.
+            Play a song, or add one from any song's <i className='fa-solid fa-ellipsis' aria-label='more options' /> menu.
           </StatusMessage>
         ) : (
           <>
@@ -48,7 +48,8 @@ export const QueuePanel = () => {
             {upcoming.length > 0 ? (
               <SongList songs={upcoming}
                         onPlay={(i) => dispatch(jumpTo(index + 1 + i))}
-                        onRemove={(i) => dispatch(removeFromQueue(index + 1 + i))} />
+                        onRemove={(i) => dispatch(removeFromQueue(index + 1 + i))} removeLabel='Remove from queue'
+                        onReorder={(from, to) => dispatch(moveInQueue({ from: index + 1 + from, to: index + 1 + to }))} />
             ) : (
               <p className='queue__hint'>When the queue ends, EchoWave keeps playing similar songs.</p>
             )}

@@ -1,6 +1,6 @@
 import { createStore } from "../../store";
 import {
-  addToQueue, clearUpcoming, cycleRepeat, jumpTo, next, playNext, playSongs, previous,
+  addToQueue, clearUpcoming, insertNext, moveInQueue, cycleRepeat, jumpTo, next, playNext, playSongs, previous,
   removeFromQueue, selectCurrentSong, toggleShuffle,
 } from "../PlayerReducer";
 import { Song } from "../../../Services/interfaces";
@@ -76,6 +76,23 @@ describe('player queue', () => {
     store.dispatch(playSongs(songs('a', 'b')));
     store.dispatch(addToQueue(song('z')));
     expect(ids(player().queue)).toEqual(['a', 'b', 'z']);
+  });
+
+  it('inserts "play next" right after the current song', () => {
+    const { store, player } = setup();
+    store.dispatch(playSongs(songs('a', 'b', 'c'), 1));
+    store.dispatch(insertNext(song('x')));
+    expect(ids(player().queue)).toEqual(['a', 'b', 'x', 'c']);
+  });
+
+  it('reorders only upcoming songs', () => {
+    const { store, player } = setup();
+    store.dispatch(playSongs(songs('a', 'b', 'c', 'd'), 1));
+    store.dispatch(moveInQueue({ from: 3, to: 2 }));
+    expect(ids(player().queue)).toEqual(['a', 'b', 'd', 'c']);
+    store.dispatch(moveInQueue({ from: 1, to: 3 }));
+    store.dispatch(moveInQueue({ from: 2, to: 0 }));
+    expect(ids(player().queue)).toEqual(['a', 'b', 'd', 'c']);
   });
 
   it('jumps to a queued song', () => {

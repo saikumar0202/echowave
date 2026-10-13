@@ -36,9 +36,31 @@
   }
 
   &__artists a,
-  &__actions {
+  &__actions,
+  &__handle {
     position: relative;
     pointer-events: auto;
+  }
+
+  &__handle {
+    @include icon-button(28px);
+    & {
+      margin: 0 -6px 0 -4px;
+      border-radius: $radius-sm;
+      color: $text-3;
+      cursor: grab;
+      // Lets touch drags start on the handle instead of scrolling the page.
+      touch-action: none;
+    }
+  }
+
+  &--dragging {
+    z-index: 2;
+    background: $surface-2;
+    box-shadow: $shadow;
+    .song-row__handle {
+      cursor: grabbing;
+    }
   }
 
   &__lead {
@@ -160,14 +182,14 @@
     }
     &:hover &__action,
     &:focus-within &__action,
-    &__action--like.is-liked {
+    &__action--like.is-liked,
+    &__action--menu[aria-expanded='true'] {
       opacity: 1;
     }
   }
 
-  // On phones there is no hover, and space is tight: keep only the heart.
+  // On phones there is no hover and space is tight: heart and menu only.
   @include mobile {
-    &__action--queue,
     &__duration {
       display: none;
     }

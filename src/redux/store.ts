@@ -1,7 +1,7 @@
 import { configureStore, ThunkAction, UnknownAction } from "@reduxjs/toolkit";
 import { rootReducer, RootState } from "./reducers/rootReducer";
 import { useDispatch, useSelector } from "react-redux";
-import { LIKED_STORAGE_KEY } from "./reducers/LibraryReducer";
+import { LIKED_STORAGE_KEY, PLAYLISTS_STORAGE_KEY } from "./reducers/LibraryReducer";
 
 export const createStore = (preloadedState?: Partial<RootState>) => configureStore({
   reducer: rootReducer,
@@ -10,17 +10,22 @@ export const createStore = (preloadedState?: Partial<RootState>) => configureSto
 
 const store = createStore();
 
-// Persist liked songs whenever they change.
-let lastLiked = store.getState().library.liked;
-store.subscribe(() => {
-  const { liked } = store.getState().library;
-  if (liked === lastLiked) return;
-  lastLiked = liked;
+// Persist the library (liked songs and playlists) whenever it changes.
+const persist = (key: string, value: unknown) => {
   try {
-    localStorage.setItem(LIKED_STORAGE_KEY, JSON.stringify(liked));
+    localStorage.setItem(key, JSON.stringify(value));
   } catch {
-    // Storage can be full or disabled (private mode); liking still works for the session.
+    // Storage can be full or disabled (private mode); changes still work for the session.
   }
+};
+
+let lastLibrary = store.getState().library;
+store.subscribe(() => {
+  const { library } = store.getState();
+  if (library === lastLibrary) return;
+  if (library.liked !== lastLibrary.liked) persist(LIKED_STORAGE_KEY, library.liked);
+  if (library.playlists !== lastLibrary.playlists) persist(PLAYLISTS_STORAGE_KEY, library.playlists);
+  lastLibrary = library;
 });
 
 export type { RootState };

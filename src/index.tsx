@@ -6,6 +6,7 @@ import './styles/theme.scss';
 import App from './App';
 import store from './redux/store';
 import { PlayerProvider } from "./player/PlayerProvider";
+import { SongMenuProvider } from "./components/SongMenu";
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
@@ -16,7 +17,9 @@ root.render(
       {/* Hash URLs work on static hosting (GitHub Pages) without a server rewrite. */}
       <HashRouter>
         <PlayerProvider>
-          <App />
+          <SongMenuProvider>
+            <App />
+          </SongMenuProvider>
         </PlayerProvider>
       </HashRouter>
     </Provider>

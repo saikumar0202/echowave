@@ -1,0 +1,98 @@
+@use "../../styles/tokens" as *;
+
+.library {
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  &__create {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+
+    input {
+      flex: 1;
+      min-width: 180px;
+      height: 40px;
+      padding: 0 14px;
+      border-radius: 999px;
+      border: 1px solid $border;
+      background: $surface;
+      color: $text;
+      font: inherit;
+      font-size: $font-md;
+      outline: none;
+      &:focus {
+        border-color: $accent;
+      }
+    }
+  }
+
+  &__grid {
+    list-style: none;
+    margin: 0 -8px;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 4px;
+
+    @include mobile {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  &__hint {
+    margin-top: 24px;
+    font-size: $font-sm;
+    color: $text-3;
+  }
+}
+
+.library-tile {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 8px;
+  border-radius: $radius;
+  color: inherit;
+  text-decoration: none;
+  transition: background-color 0.15s;
+  &:hover {
+    background: $surface;
+  }
+
+  &__cover {
+    width: 100%;
+    margin-bottom: 8px;
+    box-shadow: $shadow;
+
+    &--liked {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      aspect-ratio: 1;
+      border-radius: $radius-sm;
+      font-size: 44px;
+      color: #fff;
+      background: linear-gradient(135deg, #4f3bd6, #1ed760);
+    }
+  }
+
+  &__name {
+    @include ellipsis;
+    font-size: $font-sm;
+    font-weight: 600;
+  }
+
+  &__meta {
+    @include ellipsis;
+    font-size: $font-xs;
+    color: $text-2;
+  }
+}
