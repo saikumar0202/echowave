@@ -147,6 +147,15 @@
     height: var(--size);
   }
 
+  &__video {
+    width: min(46vw, calc(52vh * 16 / 9));
+    aspect-ratio: 16 / 9;
+    min-height: 200px;
+    border-radius: 10px;
+    background: #000;
+    box-shadow: $shadow;
+  }
+
   &__cover {
     position: relative;
     z-index: 1;

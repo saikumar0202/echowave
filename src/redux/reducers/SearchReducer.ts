@@ -3,6 +3,7 @@ import { Album, ArtistBase, Song } from "../../Services/interfaces";
 import { searchSongs } from "../../Services/songs";
 import { searchAlbums } from "../../Services/album";
 import { searchArtists } from "../../Services/artist";
+import { searchYouTubeSongs, YouTubeQuotaError } from "../../Services/youtube";
 import type { Status } from "./CatalogReducer";
 
 interface SearchState {
@@ -13,6 +14,13 @@ interface SearchState {
   artists: ArtistBase[],
   status: Status,
   requestId: string | null,
+  youtube: {
+    query: string,
+    songs: Song[],
+    status: Status,
+    error: string | null,
+    requestId: string | null,
+  },
 }
 
 const initialState: SearchState = {
@@ -22,6 +30,7 @@ const initialState: SearchState = {
   artists: [],
   status: 'idle',
   requestId: null,
+  youtube: { query: '', songs: [], status: 'idle', error: null, requestId: null },
 };
 
 export const runSearch = createAsyncThunk(
@@ -36,6 +45,10 @@ export const runSearch = createAsyncThunk(
     return { songs, albums, artists };
   },
 );
+
+// Separate from runSearch: YouTube searches cost quota, so they only run
+// when the YouTube tab is open.
+export const runYouTubeSearch = createAsyncThunk('search/youtube', (query: string) => searchYouTubeSongs(query, 20));
 
 const searchSlice = createSlice({
   name: "search",
@@ -61,6 +74,22 @@ const searchSlice = createSlice({
       .addCase(runSearch.rejected, (state, action) => {
         if (state.requestId !== action.meta.requestId) return;
         state.status = 'error';
+      })
+      .addCase(runYouTubeSearch.pending, (state, action) => {
+        state.youtube.query = action.meta.arg;
+        state.youtube.status = 'loading';
+        state.youtube.error = null;
+        state.youtube.requestId = action.meta.requestId;
+      })
+      .addCase(runYouTubeSearch.fulfilled, (state, action) => {
+        if (state.youtube.requestId !== action.meta.requestId) return;
+        state.youtube.status = 'ready';
+        state.youtube.songs = action.payload;
+      })
+      .addCase(runYouTubeSearch.rejected, (state, action) => {
+        if (state.youtube.requestId !== action.meta.requestId) return;
+        state.youtube.status = 'error';
+        state.youtube.error = action.error.name === new YouTubeQuotaError().name ? action.error.message ?? null : null;
       });
   },
 });

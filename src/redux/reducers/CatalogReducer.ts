@@ -2,6 +2,7 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { Album, Song } from "../../Services/interfaces";
 import { getSongSuggestions, getTrendingSongs } from "../../Services/songs";
 import { getTopAlbums } from "../../Services/album";
+import { getYouTubePlaylist } from "../../Services/youtube";
 import { setQueue } from "./PlayerReducer";
 import type { RootState } from "../store";
 
@@ -14,6 +15,8 @@ interface CatalogState {
   suggestions: Song[],
   suggestionsFor: string | null,
   suggestionsStatus: Status,
+  teluguHits: Song[],
+  teluguStatus: Status,
 }
 
 const initialState: CatalogState = {
@@ -23,6 +26,8 @@ const initialState: CatalogState = {
   suggestions: [],
   suggestionsFor: null,
   suggestionsStatus: 'idle',
+  teluguHits: [],
+  teluguStatus: 'idle',
 };
 
 export const loadDiscover = createAsyncThunk<{ trending: Song[], topAlbums: Album[] }, void, { state: RootState }>(
@@ -39,6 +44,12 @@ export const loadDiscover = createAsyncThunk<{ trending: Song[], topAlbums: Albu
     return { trending, topAlbums };
   },
   { condition: (_, { getState }) => !['loading', 'ready'].includes(getState().catalog.status) },
+);
+
+export const loadTeluguHits = createAsyncThunk<Song[], void, { state: RootState }>(
+  'catalog/loadTeluguHits',
+  () => getYouTubePlaylist(),
+  { condition: (_, { getState }) => !['loading', 'ready'].includes(getState().catalog.teluguStatus) },
 );
 
 export const loadSuggestions = createAsyncThunk<Song[], Song, { state: RootState }>(
@@ -63,6 +74,16 @@ const catalogSlice = createSlice({
       })
       .addCase(loadDiscover.rejected, (state) => {
         state.status = 'error';
+      })
+      .addCase(loadTeluguHits.pending, (state) => {
+        state.teluguStatus = 'loading';
+      })
+      .addCase(loadTeluguHits.fulfilled, (state, action) => {
+        state.teluguStatus = 'ready';
+        state.teluguHits = action.payload;
+      })
+      .addCase(loadTeluguHits.rejected, (state) => {
+        state.teluguStatus = 'error';
       })
       .addCase(loadSuggestions.pending, (state, action) => {
         state.suggestionsFor = action.meta.arg.id;

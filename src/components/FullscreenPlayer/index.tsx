@@ -12,6 +12,7 @@ import { ProgressBar, TransportControls, VolumeControl } from "../PlayerControls
 import './styles.scss';
 import { Artwork } from "../Artwork";
 import { useArtworkUrl } from "../../hooks/useArtworkUrl";
+import { useVideoSlot } from "../../player/videoSlots";
 
 // Hide secondary chrome and the cursor after this long without input.
 const IDLE_MS = 3000;
@@ -28,6 +29,8 @@ export const FullscreenPlayer = () => {
   const [chosenPanel, setPanel] = useState<Panel | null>(null);
   const [idle, setIdle] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
+  // Above the stage itself (z-index 95).
+  const videoSlotRef = useVideoSlot(3, 96);
   const upcoming = queue.slice(index + 1, index + 1 + UP_NEXT_LIMIT);
   const backdrop = useArtworkUrl(song?.image, 'large');
   const hasLyrics = lyrics.songId === song?.id && Boolean(lyrics.lyrics?.synced?.length || lyrics.lyrics?.plain);
@@ -105,12 +108,12 @@ export const FullscreenPlayer = () => {
 
       <main className='stage__body'>
         <section className='stage__now'>
-          <div className='stage__record-wrap'>
+          {song.source === 'youtube' ? <div className='stage__video' ref={videoSlotRef} /> : <div className='stage__record-wrap'>
             <div className='stage__record' aria-hidden='true'>
               <Artwork className='stage__label' images={song.image} size='small' />
             </div>
             <Artwork className='stage__cover' images={song.image} size='large' alt={`${name} cover art`} />
-          </div>
+          </div>}
           <div className='stage__meta'>
             <div className='stage__titles'>
               <h2 className='stage__title' title={name}>{name}</h2>

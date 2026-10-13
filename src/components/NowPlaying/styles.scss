@@ -117,6 +117,25 @@
     }
   }
 
+  // Placeholder the YouTube video dock positions itself over. Square like the
+  // cover art, or 16:9 above lyrics; never under YouTube's 200px minimum.
+  &__video {
+    width: 100%;
+    max-width: 340px;
+    margin: 0 auto;
+    aspect-ratio: 1;
+    min-height: 200px;
+    flex-shrink: 0;
+    border-radius: $radius;
+    background: #000;
+
+    &--compact {
+      max-width: none;
+      aspect-ratio: auto;
+      height: 200px;
+    }
+  }
+
   &__info {
     display: flex;
     align-items: center;
@@ -187,7 +206,8 @@
       text-align: center;
     }
 
-    &__art {
+    &__art,
+    &__video:not(&__video--compact) {
       flex: 0 1 auto;
       width: min(100%, 52vh);
       max-width: none;

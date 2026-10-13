@@ -10,6 +10,7 @@ import { MiniPlayer } from "./components/MiniPlayer";
 import { QueuePanel } from "./components/QueuePanel";
 import { Toast } from "./components/Toast";
 import { FullscreenPlayer } from "./components/FullscreenPlayer";
+import { VideoDock } from "./components/VideoDock";
 import { useOnlineStatus } from "./hooks/useOnlineStatus";
 import { Discover } from "./views/Discover";
 import { Search } from "./views/Search";
@@ -64,6 +65,7 @@ function App() {
       <MiniPlayer />
       <BottomNav />
       {fullscreenOpen && <FullscreenPlayer />}
+      <VideoDock />
       <Toast />
     </div>
   );

@@ -45,6 +45,16 @@ export default defineConfig({
             },
           },
           {
+            // YouTube thumbnails.
+            urlPattern: ({ url }) => url.hostname === 'i.ytimg.com',
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'youtube-thumbnails',
+              expiration: { maxEntries: 300, maxAgeSeconds: 30 * DAY },
+              cacheableResponse: { statuses: [0, 200] },
+            },
+          },
+          {
             // Icon font and web fonts.
             urlPattern: ({ url }) => ['fonts.googleapis.com', 'fonts.gstatic.com', 'cdnjs.cloudflare.com'].includes(url.hostname),
             handler: 'StaleWhileRevalidate',

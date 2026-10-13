@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "../../redux/store";
-import { loadDiscover } from "../../redux/reducers/CatalogReducer";
+import { loadDiscover, loadTeluguHits } from "../../redux/reducers/CatalogReducer";
+import { youtubeEnabled } from "../../Services/youtube";
 import { playSongs, selectCurrentSong } from "../../redux/reducers/PlayerReducer";
 import { AlbumCard } from "../../components/AlbumCard";
 import { SongList } from "../../components/SongList";
@@ -13,12 +14,16 @@ const TRENDING_PREVIEW = 10;
 
 export const Discover = () => {
   const dispatch = useAppDispatch();
-  const { trending, topAlbums, status, suggestions, suggestionsStatus } = useAppSelector((state) => state.catalog);
+  const { trending, topAlbums, status, suggestions, suggestionsStatus, teluguHits, teluguStatus } = useAppSelector((state) => state.catalog);
   const current = useAppSelector(selectCurrentSong);
 
   useEffect(() => {
     if (status === 'idle') dispatch(loadDiscover());
   }, [status, dispatch]);
+
+  useEffect(() => {
+    if (youtubeEnabled()) dispatch(loadTeluguHits());
+  }, [dispatch]);
 
   const loading = status === 'idle' || status === 'loading';
 
@@ -38,6 +43,13 @@ export const Discover = () => {
               </ul>
             )}
           </Section>
+
+          {youtubeEnabled() && teluguStatus !== 'error' && (
+            <Section title='Telugu hits' subtitle='From YouTube'
+                     action={teluguHits.length > 0 && <PlayAllButton onClick={() => dispatch(playSongs(teluguHits))} />}>
+              {teluguStatus === 'ready' ? <SongList songs={teluguHits.slice(0, TRENDING_PREVIEW)} /> : <SongListSkeleton rows={4} />}
+            </Section>
+          )}
 
           {(suggestions.length > 0 || suggestionsStatus === 'loading') && current && (
             <Section title='You may like' subtitle={`Because you're listening to ${decodeEntities(current.name)}`}

@@ -30,7 +30,12 @@ export const ArtistLinks = ({ artists, className = '' }: { artists: Artists | un
       {list.map((artist, index) => (
         <React.Fragment key={`${artist.id}-${index}`}>
           {index > 0 && ', '}
-          <Link to={routes.artist(artist.id)}>{decodeEntities(artist.name)}</Link>
+          {artist.id.startsWith('yt-channel:') ? (
+            // YouTube uploaders have no artist page here; link to the channel.
+            <a href={artist.url} target='_blank' rel='noreferrer'>{decodeEntities(artist.name)}</a>
+          ) : (
+            <Link to={routes.artist(artist.id)}>{decodeEntities(artist.name)}</Link>
+          )}
         </React.Fragment>
       ))}
     </span>

@@ -133,6 +133,7 @@ describe('playNext', () => {
       catalog: {
         trending: [], topAlbums: [], status: 'ready',
         suggestions: songs('b', 's1', 's2'), suggestionsFor: 'b', suggestionsStatus: 'ready',
+        teluguHits: [], teluguStatus: 'idle',
       },
     });
     store.dispatch(playSongs(songs('a', 'b'), 1));

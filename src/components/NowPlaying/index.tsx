@@ -12,10 +12,18 @@ import './styles.scss';
 import { Artwork } from "../Artwork";
 import { useArtworkUrl } from "../../hooks/useArtworkUrl";
 import { Song } from "../../Services/interfaces";
+import { useVideoSlot } from "../../player/videoSlots";
 
 const NowPlayingBackdrop = ({ song }: { song: Song }) => {
   const art = useArtworkUrl(song.image, 'large');
   return <div className='now-playing__backdrop' style={{ backgroundImage: `url(${art})` }} aria-hidden='true' />;
+};
+
+// Where the YouTube video shows in this panel (the dock sits on top of it).
+// Above the bottom nav and mini player; below drawers and menus.
+const VideoSlot = ({ compact = false }: { compact?: boolean }) => {
+  const slotRef = useVideoSlot(2, 41);
+  return <div className={`now-playing__video ${compact ? 'now-playing__video--compact' : ''}`} ref={slotRef} />;
 };
 
 export const NowPlaying = () => {
@@ -70,7 +78,8 @@ export const NowPlaying = () => {
         </button>
       </header>
 
-      {lyricsOpen ? <LyricsPanel song={song} /> : (
+      {song.source === 'youtube' && <VideoSlot compact={lyricsOpen} />}
+      {lyricsOpen ? <LyricsPanel song={song} /> : song.source !== 'youtube' && (
         <div className='now-playing__art'>
           <Artwork images={song.image} size='large' alt={`${name} cover art`} />
         </div>

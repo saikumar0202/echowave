@@ -7,10 +7,18 @@ import { showToast } from "../redux/reducers/UIReducer";
 import { enterFullscreen, exitFullscreen } from "./fullscreen";
 import { artistNames, decodeEntities, pickAudio } from "../utils/format";
 import { PlaybackContext, PlaybackContextValue } from "./playback";
+import { getYouTubePlayer, preloadYouTubePlayer, setYouTubeEvents, YT_STATE } from "./youtubePlayer";
 
 const VOLUME_STORAGE_KEY = 'echowave:volume';
 // Pressing "previous" this far into a song restarts it instead.
 const RESTART_THRESHOLD_SECONDS = 3;
+// How often to read the position from the YouTube player (it has no timeupdate event).
+const YOUTUBE_POLL_MS = 250;
+// Mobile browsers may block autoplay inside the YouTube frame; if the video
+// hasn't started by then, show it as paused so one tap starts it.
+const YOUTUBE_AUTOPLAY_GRACE_MS = 2500;
+
+type YouTubePlayer = Awaited<ReturnType<typeof getYouTubePlayer>>;
 
 const readStoredVolume = (): number => {
   try {
@@ -28,12 +36,17 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
   const dispatch = useAppDispatch();
   const song = useAppSelector(selectCurrentSong);
   const { isPlaying, repeat } = useAppSelector((state) => state.player);
+  const isYouTube = song?.source === 'youtube';
+  const queueHasYouTube = useAppSelector((state) => state.player.queue.some((item) => item.source === 'youtube'));
 
   const store = useStore() as AppStore;
   const audioRef = useRef<HTMLAudioElement>(null);
   // True between assigning a new src and it becoming playable; the browser
   // may fire a "pause" event in that window which isn't a user pause.
   const switchingSrcRef = useRef(false);
+  const youtubeRef = useRef<YouTubePlayer | null>(null);
+  // Same idea for YouTube: ignore pause events while a new video loads.
+  const switchingVideoRef = useRef(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [volume, setVolumeState] = useState(readStoredVolume);
@@ -44,17 +57,58 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio || !song) return;
+    setCurrentTime(0);
+    setDuration(song.duration || 0);
+    dispatch(loadSuggestions(song));
+
+    if (song.source === 'youtube' && song.videoId) {
+      if (audio.getAttribute('src')) {
+        audio.pause();
+        audio.removeAttribute('src');
+        audio.load();
+      }
+      switchingVideoRef.current = true;
+      let graceTimer = 0;
+      getYouTubePlayer().then((player) => {
+        youtubeRef.current = player;
+        // The song may have changed while the player was loading.
+        if (selectCurrentSong(store.getState())?.id !== song.id) return;
+        player.setVolume(Math.round(volumeRef.current * 100));
+        if (mutedRef.current) player.mute(); else player.unMute();
+        if (store.getState().player.isPlaying) {
+          player.loadVideoById(song.videoId!);
+          graceTimer = window.setTimeout(() => {
+            const state = player.getPlayerState();
+            if (state !== YT_STATE.PLAYING && state !== YT_STATE.BUFFERING) {
+              switchingVideoRef.current = false;
+              dispatch(setPlaying(false));
+            }
+          }, YOUTUBE_AUTOPLAY_GRACE_MS);
+        } else {
+          player.cueVideoById(song.videoId!);
+        }
+      }).catch(() => {
+        dispatch(showToast("Couldn't load the YouTube player"));
+        dispatch(setPlaying(false));
+      });
+      return () => window.clearTimeout(graceTimer);
+    }
+
+    youtubeRef.current?.stopVideo();
     const src = pickAudio(song.downloadUrl);
     if (!src) return;
     switchingSrcRef.current = true;
     audio.src = src;
-    setCurrentTime(0);
-    setDuration(song.duration || 0);
-    dispatch(loadSuggestions(song));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [song?.id, dispatch]);
 
   useEffect(() => {
+    if (isYouTube) {
+      const player = youtubeRef.current;
+      if (!player) return;
+      if (isPlaying) player.playVideo(); else player.pauseVideo();
+      return;
+    }
     const audio = audioRef.current;
     if (!audio || !audio.src) return;
     if (isPlaying) {
@@ -66,13 +120,40 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
     } else {
       audio.pause();
     }
-  }, [isPlaying, song?.id, dispatch]);
+  }, [isPlaying, isYouTube, song?.id, dispatch]);
+
+  // The YouTube player has no time events, so poll it while a video is current.
+  useEffect(() => {
+    if (!isYouTube) return;
+    const timer = window.setInterval(() => {
+      const player = youtubeRef.current;
+      if (!player) return;
+      const time = player.getCurrentTime?.();
+      if (Number.isFinite(time)) setCurrentTime(time);
+      const length = player.getDuration?.();
+      if (length > 0) setDuration(length);
+    }, YOUTUBE_POLL_MS);
+    return () => window.clearInterval(timer);
+  }, [isYouTube, song?.id]);
+
+  useEffect(() => {
+    if (queueHasYouTube) preloadYouTubePlayer();
+  }, [queueHasYouTube]);
 
   useEffect(() => {
     if (audioRef.current) audioRef.current.loop = repeat === 'one';
   }, [repeat]);
 
+  const volumeRef = useRef(volume);
+  const mutedRef = useRef(muted);
   useEffect(() => {
+    volumeRef.current = volume;
+    mutedRef.current = muted;
+    const player = youtubeRef.current;
+    if (player) {
+      player.setVolume(Math.round(volume * 100));
+      if (muted) player.mute(); else player.unMute();
+    }
     const audio = audioRef.current;
     if (!audio) return;
     audio.volume = volume;
@@ -86,20 +167,26 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
 
   const toggle = useCallback(() => dispatch(togglePlaying()), [dispatch]);
   const next = useCallback(() => dispatch(playNext()), [dispatch]);
+  const currentIsYouTube = useCallback(() => selectCurrentSong(store.getState())?.source === 'youtube', [store]);
   const seek = useCallback((time: number) => {
-    const audio = audioRef.current;
-    if (!audio || !Number.isFinite(time)) return;
-    audio.currentTime = time;
+    if (!Number.isFinite(time)) return;
+    if (currentIsYouTube()) {
+      youtubeRef.current?.seekTo(time, true);
+    } else {
+      const audio = audioRef.current;
+      if (!audio) return;
+      audio.currentTime = time;
+    }
     setCurrentTime(time);
-  }, []);
+  }, [currentIsYouTube]);
   const prev = useCallback(() => {
-    const audio = audioRef.current;
-    if (audio && audio.currentTime > RESTART_THRESHOLD_SECONDS) {
+    const position = currentIsYouTube() ? youtubeRef.current?.getCurrentTime() ?? 0 : audioRef.current?.currentTime ?? 0;
+    if (position > RESTART_THRESHOLD_SECONDS) {
       seek(0);
     } else {
       dispatch(previous());
     }
-  }, [dispatch, seek]);
+  }, [dispatch, seek, currentIsYouTube]);
   const setVolume = useCallback((value: number) => {
     setVolumeState(value);
     if (value > 0) setMuted(false);
@@ -110,14 +197,53 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
     const endedId = selectCurrentSong(store.getState())?.id;
     dispatch(playNext());
     const state = store.getState();
-    // Same song again (e.g. repeat-all with a single song): the src won't
+    // Same song again (e.g. repeat-all with a single song): the source won't
     // change, so restart it by hand.
+    if (!state.player.isPlaying || selectCurrentSong(state)?.id !== endedId) return;
+    if (currentIsYouTube()) {
+      youtubeRef.current?.seekTo(0, true);
+      youtubeRef.current?.playVideo();
+      return;
+    }
     const audio = audioRef.current;
-    if (audio && state.player.isPlaying && selectCurrentSong(state)?.id === endedId) {
+    if (audio) {
       audio.currentTime = 0;
       audio.play().catch(() => dispatch(setPlaying(false)));
     }
-  }, [dispatch, store]);
+  }, [dispatch, store, currentIsYouTube]);
+
+  // YouTube player events. They're ignored unless a YouTube song is current,
+  // since stopping a video (when switching to Audius) fires them too.
+  useEffect(() => {
+    setYouTubeEvents({
+      onStateChange: (playerState) => {
+        const state = store.getState();
+        if (selectCurrentSong(state)?.source !== 'youtube') return;
+        if (playerState === YT_STATE.PLAYING) {
+          switchingVideoRef.current = false;
+          if (!state.player.isPlaying) dispatch(setPlaying(true));
+        } else if (playerState === YT_STATE.CUED) {
+          switchingVideoRef.current = false;
+        } else if (playerState === YT_STATE.PAUSED) {
+          if (state.player.isPlaying && !switchingVideoRef.current) dispatch(setPlaying(false));
+        } else if (playerState === YT_STATE.ENDED) {
+          if (state.player.repeat === 'one') {
+            youtubeRef.current?.seekTo(0, true);
+            youtubeRef.current?.playVideo();
+          } else {
+            handleEnded();
+          }
+        }
+      },
+      onError: () => {
+        const failed = selectCurrentSong(store.getState());
+        if (failed?.source !== 'youtube') return;
+        switchingVideoRef.current = false;
+        dispatch(showToast(`“${decodeEntities(failed.name)}” can't be played here, skipping`));
+        if (store.getState().player.isPlaying) dispatch(playNext());
+      },
+    });
+  }, [dispatch, store, handleEnded]);
 
   const handleError = useCallback(() => {
     switchingSrcRef.current = false;
@@ -206,11 +332,14 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
           const { duration: audioDuration } = event.currentTarget;
           if (Number.isFinite(audioDuration)) setDuration(audioDuration);
         }}
-        onPlay={() => !isPlaying && dispatch(setPlaying(true))}
+        onPlay={() => !isPlaying && !currentIsYouTube() && dispatch(setPlaying(true))}
         onCanPlay={() => { switchingSrcRef.current = false; }}
         onError={handleError}
         onPause={(event) => {
-          if (isPlaying && !switchingSrcRef.current && !event.currentTarget.ended) dispatch(setPlaying(false));
+          // Pausing the audio element to hand over to YouTube isn't a user pause.
+          if (isPlaying && !switchingSrcRef.current && !event.currentTarget.ended && !currentIsYouTube()) {
+            dispatch(setPlaying(false));
+          }
         }}
         onEnded={handleEnded}
       />

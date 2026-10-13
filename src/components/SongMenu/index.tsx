@@ -139,7 +139,12 @@ const SongMenu = ({ state, onClose }: { state: MenuState, onClose: () => void })
                 <i className='fa-solid fa-compact-disc' /> Go to album
               </button>
             )}
-            {primaryArtist && (
+            {song.source === 'youtube' && (
+              <a role='menuitem' className='song-menu__item' href={song.url} target='_blank' rel='noreferrer' onClick={onClose}>
+                <i className='fa-brands fa-youtube' /> Open on YouTube
+              </a>
+            )}
+            {primaryArtist && song.source !== 'youtube' && (
               <button role='menuitem' className='song-menu__item' onClick={run(() => navigate(routes.artist(primaryArtist.id)))}>
                 <i className='fa-solid fa-user' /> Go to artist
               </button>

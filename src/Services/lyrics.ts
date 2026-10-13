@@ -106,7 +106,16 @@ export const getLyrics = async (song: Song): Promise<Lyrics | null> => {
   const best = results
     .filter((record) => quality(record) > 0 && durationMatches(record, song))
     .sort((a, b) => score(b) - score(a))[0];
-  return best && score(best) >= 10 ? toLyrics(best) : null;
+  if (best && score(best) >= 10) return toLyrics(best);
+  // YouTube songs are credited to the uploading label (e.g. "T-Series Telugu"),
+  // not the singer, so accept a title match with a near-exact length instead.
+  if (song.source === 'youtube') {
+    const byLength = results
+      .filter((record) => quality(record) >= 2 && record.duration != null && Math.abs(record.duration - song.duration) <= 2)
+      .sort((a, b) => quality(b) - quality(a))[0];
+    if (byLength) return toLyrics(byLength);
+  }
+  return null;
 };
 
 // Lines light up slightly early so they feel in time with the singing.

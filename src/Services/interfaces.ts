@@ -76,6 +76,9 @@ export interface Song extends Name {
   copyright: string,
   // Used to find similar songs.
   genre?: string,
+  // Where the song plays from; Audius when not set.
+  source?: 'audius' | 'youtube',
+  videoId?: string,
   album: {
     id: string,
     name: string,

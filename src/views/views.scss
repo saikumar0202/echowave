@@ -197,3 +197,35 @@
     display: block;
   }
 }
+
+.source-tabs {
+  display: inline-flex;
+  gap: 4px;
+  margin: -8px 0 24px;
+  padding: 4px;
+  border-radius: 999px;
+  background: $surface;
+  border: 1px solid $border;
+
+  button {
+    @include reset-button;
+    & {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      border-radius: 999px;
+      font-size: $font-sm;
+      font-weight: 600;
+      color: $text-2;
+      transition: background-color 0.15s, color 0.15s;
+    }
+    &:hover {
+      color: $text;
+    }
+    &.is-active {
+      background: $text;
+      color: $bg;
+    }
+  }
+}
