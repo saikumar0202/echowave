@@ -1,5 +1,7 @@
 # EchoWave
 
+**Live:** https://echowave-theta.vercel.app
+
 A responsive music streaming web app built with React, TypeScript, Redux Toolkit, React Router and SCSS, bundled with Vite. Music comes from [Audius](https://audius.org), an open music platform whose public API streams full tracks uploaded by the artists themselves. No API key or backend is needed.
 
 ## Features
@@ -58,3 +60,4 @@ src/
 
 - `.github/workflows/ci.yml` runs lint, tests and a production build on every pull request.
 - `.github/workflows/deploy.yml` runs the same checks, then builds and publishes to GitHub Pages on every push to `main`. No backend or secrets are required.
+- Vercel deploys the app from this repository (`vercel.json` holds the build settings) to https://echowave-theta.vercel.app.
